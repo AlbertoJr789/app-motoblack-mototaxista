@@ -70,9 +70,69 @@ class _ProfileDetailsState extends State<ProfileDetails> {
                 height: 4,
               ),
               TextFormField(),
+              const SizedBox(
+                height: 12,
+              ),
+              Container(
+                width: double.infinity,
+                child: const Text(
+                  'Dados do Veículo',
+                  style: TextStyle(
+                      fontSize: 28, color: Color.fromARGB(255, 216, 216, 216)),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(
+                height: 4,
+              ),
+              const Text(
+                'Modelo',
+                style: TextStyle(
+                    fontSize: 22, color: Color.fromARGB(255, 216, 216, 216)),
+                textAlign: TextAlign.start,
+              ),
+              TextFormField(),
+              const SizedBox(
+                height: 4,
+              ),
+              const Text(
+                'Placa',
+                style: TextStyle(
+                    fontSize: 22, color: Color.fromARGB(255, 216, 216, 216)),
+                textAlign: TextAlign.start,
+              ),
+              TextFormField(),
+              const SizedBox(
+                height: 4,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  // width: double.infinity,
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.4,
+                    height: MediaQuery.of(context).size.height * 0.07,
+                    child: ElevatedButton.icon(
+                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.save,
+                        color: Colors.white,
+                      ),
+                      label: const Text(
+                        "Enviar",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 8,
+              ),
             ],
           ),
         ),
+        
       ),
     );
   }

@@ -37,7 +37,7 @@ class PaymentDetails extends StatelessWidget {
                     alignment: Alignment.bottomLeft,
                     child: ElevatedButton(
                       onPressed: () {},
-                      child: Text('Adicionar Créditos'),
+                      child: Text('Transferir Créditos'),
                     ),
                   )
                 ],
@@ -45,35 +45,6 @@ class PaymentDetails extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(
-          height: 10,
-        ),
-        Container(
-            height: MediaQuery.of(context).size.height * 0.3,
-            child: Card(
-              color: Color.fromARGB(255, 216, 216, 216),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Métodos de Pagamento',
-                        style: TextStyle(fontSize: 36),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.bottomLeft,
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        child: Text('Adicionar'),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            )),
       ],
     );
   }
