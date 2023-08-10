@@ -30,15 +30,16 @@ class _ActivitiesState extends State<Activities> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(children: [
-                  Container(
+                   Container(
                     width: 100,
-                    child: Column(
+                    child: const Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Mototaxista Responsável',
+                          'Passageiro',
                           textAlign: TextAlign.center,
                         ),
+                        SizedBox(height: 8,),
                         CircleAvatar(
                           radius: 30,
                           backgroundColor: Colors.blue,
@@ -46,7 +47,7 @@ class _ActivitiesState extends State<Activities> {
                       ],
                     ),
                   ),
-                  Expanded(
+                  const Expanded(
                     child: Column(
                       // mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,7 +57,7 @@ class _ActivitiesState extends State<Activities> {
                       ],
                     ),
                   ),
-                  Column(
+                  const Column(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [

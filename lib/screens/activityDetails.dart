@@ -81,8 +81,11 @@ class ActivityDetails extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Mototaxista Responsável',
+                              'Passageiro',
                               textAlign: TextAlign.center,
+                            ),
+                            SizedBox(
+                              height: 8,
                             ),
                             CircleAvatar(
                               radius: 30,
@@ -93,18 +96,10 @@ class ActivityDetails extends StatelessWidget {
                       ),
                       Expanded(
                         child: Column(
-                          // mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Arlindo de Souza Arantes'),
-                            Text('Veículo HYJ-9486'),
-                          ],
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [Text('Nota dada pelo passageiro:'), Text('☆☆☆☆☆')],
                         ),
-                      ),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [Text('Nota'), Text('☆☆☆☆☆')],
                       )
                     ]),
                   ],
