@@ -1,6 +1,6 @@
-import 'package:app_motoblack_cliente/screens/activities.dart';
-import 'package:app_motoblack_cliente/screens/home.dart';
-import 'package:app_motoblack_cliente/screens/profile.dart';
+import 'package:app_motoblack_mototaxista/screens/activities.dart';
+import 'package:app_motoblack_mototaxista/screens/home.dart';
+import 'package:app_motoblack_mototaxista/screens/profile.dart';
 import 'package:flutter/material.dart';
 
 

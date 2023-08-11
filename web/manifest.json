@@ -1,6 +1,6 @@
 {
-    "name": "app_motoblack_cliente",
-    "short_name": "app_motoblack_cliente",
+    "name": "app_motoblack_mototaxista",
+    "short_name": "app_motoblack_mototaxista",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

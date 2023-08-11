@@ -1,4 +1,4 @@
-import 'package:app_motoblack_cliente/screens/activityDetails.dart';
+import 'package:app_motoblack_mototaxista/screens/activityDetails.dart';
 import 'package:flutter/material.dart';
 
 class Activities extends StatefulWidget {

@@ -1,6 +1,6 @@
-import 'package:app_motoblack_cliente/widgets/help.dart';
-import 'package:app_motoblack_cliente/widgets/paymentDetails.dart';
-import 'package:app_motoblack_cliente/widgets/profileDetails.dart';
+import 'package:app_motoblack_mototaxista/widgets/help.dart';
+import 'package:app_motoblack_mototaxista/widgets/paymentDetails.dart';
+import 'package:app_motoblack_mototaxista/widgets/profileDetails.dart';
 import 'package:flutter/material.dart';
 
 class Profile extends StatefulWidget {
