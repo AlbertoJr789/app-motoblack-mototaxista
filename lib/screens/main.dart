@@ -3,8 +3,6 @@ import 'package:app_motoblack_mototaxista/screens/home.dart';
 import 'package:app_motoblack_mototaxista/screens/profile.dart';
 import 'package:flutter/material.dart';
 
-
-
 class Main extends StatefulWidget {
   const Main({super.key});
 
@@ -13,9 +11,9 @@ class Main extends StatefulWidget {
 }
 
 class _MainState extends State<Main> {
-   int _pageIndex = 0;
-   List<Widget> pages = [Home(), const Activities(), const Profile()];
- 
+  int _pageIndex = 0;
+  List<Widget> pages = [Home(), const Activities(), const Profile()];
+
   void _selectPage(int index) {
     setState(() {
       _pageIndex = index;
@@ -25,7 +23,10 @@ class _MainState extends State<Main> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: pages[_pageIndex],
+      body: IndexedStack(
+        index: _pageIndex,
+        children: pages,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         onTap: _selectPage,
         currentIndex: _pageIndex,

@@ -1,11 +1,17 @@
+import 'package:app_motoblack_mototaxista/firebase_options.dart';
 import 'package:app_motoblack_mototaxista/screens/home.dart';
 import 'package:app_motoblack_mototaxista/screens/main.dart';
 import 'package:app_motoblack_mototaxista/screens/welcome.dart';
 import 'package:app_motoblack_mototaxista/theme/theme.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
