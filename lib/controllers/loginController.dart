@@ -1,4 +1,6 @@
 import 'package:app_motoblack_mototaxista/controllers/apiClient.dart';
+import 'package:app_motoblack_mototaxista/main.dart';
+import 'package:app_motoblack_mototaxista/screens/login.dart';
 import 'package:app_motoblack_mototaxista/util/util.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -34,4 +36,11 @@ class LoginController {
       return false;
     }
   }
+  
+  static logoff() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token');
+    navigatorKey.currentState?.pushAndRemoveUntil(MaterialPageRoute(builder: (ctx) => Login()), (route) => false);
+  }
+
 }
