@@ -5,6 +5,7 @@ import 'package:app_motoblack_mototaxista/theme/theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -13,6 +14,7 @@ void main() async {
   await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
   );
+  await Permission.camera.request();
     //verifica se o usuário já logou
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   final String? token = await prefs.getString('token');

@@ -25,6 +25,7 @@ class LoginController {
         data: {
           'name': user,
           'password': password,
+          'type': 'A'
         },
       );
 
