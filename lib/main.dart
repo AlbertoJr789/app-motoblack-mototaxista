@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Moto Black',
       theme: kTheme,
-      home:  login! ? Login() : const Main(),
+      home:  login! ? const Login() : const Main(),
     );
   }
 }

@@ -18,9 +18,6 @@ class _HomeState extends State<Home>
   bool _activityMode = false;
   bool _foundPassenger = false;
   
-  late AnimationController _controller;
-  late Animation<Alignment> _topAlignmentAnimation;
-  late Animation<Alignment> _bottomAlignmentAnimation;
   late Timer _timer;
   late String _time;
   final Stopwatch _stopwatch = Stopwatch();
@@ -29,54 +26,12 @@ class _HomeState extends State<Home>
   void dispose() {
     _timer.cancel();
     _stopwatch.stop();
-    _controller.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
-    _controller =
-        AnimationController(vsync: this, duration: const Duration(seconds: 4));
-    _topAlignmentAnimation = TweenSequence<Alignment>([
-      TweenSequenceItem<Alignment>(
-          tween: Tween<Alignment>(
-              begin: Alignment.topLeft, end: Alignment.topRight),
-          weight: 1),
-      TweenSequenceItem<Alignment>(
-          tween: Tween<Alignment>(
-              begin: Alignment.topRight, end: Alignment.bottomRight),
-          weight: 1),
-      TweenSequenceItem<Alignment>(
-          tween: Tween<Alignment>(
-              begin: Alignment.bottomRight, end: Alignment.bottomLeft),
-          weight: 1),
-      TweenSequenceItem<Alignment>(
-          tween: Tween<Alignment>(
-              begin: Alignment.bottomLeft, end: Alignment.topLeft),
-          weight: 1),
-    ]).animate(_controller);
-
-    _bottomAlignmentAnimation = TweenSequence<Alignment>([
-      TweenSequenceItem<Alignment>(
-          tween: Tween<Alignment>(
-              begin: Alignment.bottomRight, end: Alignment.bottomLeft),
-          weight: 1),
-      TweenSequenceItem<Alignment>(
-          tween: Tween<Alignment>(
-              begin: Alignment.bottomLeft, end: Alignment.topLeft),
-          weight: 1),
-      TweenSequenceItem<Alignment>(
-          tween: Tween<Alignment>(
-              begin: Alignment.topLeft, end: Alignment.topRight),
-          weight: 1),
-      TweenSequenceItem<Alignment>(
-          tween: Tween<Alignment>(
-              begin: Alignment.topRight, end: Alignment.bottomRight),
-          weight: 1),
-    ]).animate(_controller);
-    _controller.repeat();
-
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_stopwatch.elapsed.inHours > 0) {
         setState(() {
@@ -178,21 +133,15 @@ class _HomeState extends State<Home>
                         child: Container(
                           width: MediaQuery.of(context).size.width * 0.85,
                           height: MediaQuery.of(context).size.width * 0.20,
-                          child: _foundPassenger ? AnimatedBuilder(
-                      animation: _controller,
-                      builder: (context, _) {
-                        _stopwatch.start();
-                        return Container(
+                          child: _foundPassenger ? Container(
                           width: double.infinity,
                           height: MediaQuery.of(context).size.height * 0.1,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             gradient: LinearGradient(
-                                colors: const [
+                                colors: [
                                   Color.fromARGB(255, 197, 179, 88),
                                   Color.fromARGB(255, 238, 205, 39),
-                                ],
-                                begin: _topAlignmentAnimation.value,
-                                end: _bottomAlignmentAnimation.value),
+                                ],),
                           ),
                           child: Center(
                             child: Column(
@@ -224,9 +173,9 @@ class _HomeState extends State<Home>
                               ],
                             ),
                           ),
-                        );
-                      },
-                    ) : ElevatedButton.icon(
+                        )
+                      
+                     : ElevatedButton.icon(
                             onPressed: () {
                               _foundPassenger = false;
                               _activityMode = false;
@@ -243,64 +192,12 @@ class _HomeState extends State<Home>
                         ),
                       ),
                     ),
-                    if (!_foundPassenger)
-                      AnimatedBuilder(
-                        animation: _controller,
-                        builder: (context, _) {
-                          return GestureDetector(
-                            onTap: _passengerDialog,
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  width: double.infinity,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.1,
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                        colors: const [
-                                          Color.fromARGB(255, 197, 179, 88),
-                                          Color.fromARGB(255, 238, 205, 39),
-                                        ],
-                                        begin: _topAlignmentAnimation.value,
-                                        end: _bottomAlignmentAnimation.value),
-                                  ),
-                                  child: const Center(
-                                    child: Text(
-                                      "Aguardando Passageiro...",
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      )
+               
                   ],
                 )
-              : Center(
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.85,
-                    height: MediaQuery.of(context).size.width * 0.3,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        _activityMode = true;
-                      },
-                      icon: const Icon(
-                        size: 48,
-                        Icons.motorcycle,
-                      ),
-                      label: const Text(
-                        "Iniciar as Atividades",
-                        style: TextStyle(fontSize: 24),
-                      ),
-                    ),
-                  ),
-                )),
+              : null //ToggleOnline()
+                
+                ),
     );
   }
 }
