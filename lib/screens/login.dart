@@ -130,10 +130,6 @@ class _LoginState extends State<Login> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.all<Color>(
-                        Theme.of(context).colorScheme.surface),
-                  ),
                   onPressed: !_isLoggingIn ? () {
                     _login(context);
                   } : null,
@@ -177,10 +173,6 @@ class _LoginState extends State<Login> {
               Container(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.all<Color>(
-                        Theme.of(context).colorScheme.surface),
-                  ),
                   onPressed: () {
                     _telaPrincipal(context);
                   },
@@ -202,10 +194,6 @@ class _LoginState extends State<Login> {
               Container(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.all<Color>(
-                        Theme.of(context).colorScheme.surface),
-                  ),
                   onPressed: () {
                     _telaPrincipal(context);
                   },

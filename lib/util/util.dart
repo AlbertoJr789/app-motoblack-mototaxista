@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 
 void showAlert(BuildContext context,String message, String sol, String error) {
+    print(error);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(

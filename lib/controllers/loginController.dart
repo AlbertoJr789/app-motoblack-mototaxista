@@ -33,7 +33,8 @@ class LoginController {
       await prefs.setString('token', response.data['token']);
       return true;
     } on DioException catch (e) {
-      showAlert(context, "Erro ao realizar login", "Verifique suas credenciais", e.response?.data ? e.response?.data['message'] : e.toString());
+      String message =  e.response?.data['message'] ?? e.toString();
+      showAlert(context, "Erro ao realizar login", "Verifique suas credenciais", message);
       return false;
     }
   }
