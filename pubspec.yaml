@@ -48,6 +48,7 @@ dependencies:
   shared_preferences: ^2.2.2
   permission_handler: ^11.3.1
   animated_toggle_switch: ^0.8.3
+  cloud_firestore: ^4.17.5
 
 dev_dependencies:
   flutter_test:

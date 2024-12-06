@@ -1,10 +1,13 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:app_motoblack_mototaxista/controllers/activityController.dart';
 import 'package:app_motoblack_mototaxista/models/Agent.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class ToggleOnline extends StatefulWidget {
   const ToggleOnline({super.key});
@@ -17,25 +20,47 @@ class _ToggleOnlineState extends State<ToggleOnline> {
   bool _online = false;
 
   late ActivityController _controller;
+  late StreamSubscription _stream;
 
   void _toggleOnline(b) async {
-    if(b){
-       _online = await _controller.getOnline();
-    }else{
-       _online = await _controller.getOffline();
+    if (b) {
+      await _controller.getOnline();
+      await _stream.cancel();
+      await _listenOnline();
+    } else {
+      await _controller.getOffline();
+      await _stream.cancel();
     }
-    setState(() {
+  }
+
+   _listenOnline() async {
+    Agent.getUuid().then((value) {
+      print('mimde');
+      print(value);
+      if (value.isNotEmpty) {
+          _stream = FirebaseFirestore.instance.collection('availableAgents').doc(value).snapshots().listen((querySnapshot) {
+            print(querySnapshot);
+            if(querySnapshot.exists){
+              setState(() {
+                _online = true;
+              });
+            }else{
+              print('nao existe,cancela');
+              Agent.setUuid('');
+              _stream.cancel();
+              setState(() {
+                _online = false;
+              });
+            }
+          });
+      }
     });
   }
 
   @override
   initState() {
     super.initState();
-    Agent.getUuid().then((value) {
-      setState(() {
-        _online = value.isNotEmpty;
-      });
-    });
+    _listenOnline();  
   }
 
   @override
@@ -77,4 +102,12 @@ class _ToggleOnlineState extends State<ToggleOnline> {
       )),
     );
   }
+
+
+  @override
+  void dispose() {
+    super.dispose();
+    _stream.cancel();
+  }
+
 }
