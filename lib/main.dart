@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'Moto Black',
       theme: kTheme,
       home:  login! ? const Login() : const Main(),

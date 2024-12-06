@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:app_motoblack_mototaxista/widgets/toggleOnline.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -14,10 +15,10 @@ class _HomeState extends State<Home>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<Home> {
   @override
   bool get wantKeepAlive => true;
-  
+
   bool _activityMode = false;
   bool _foundPassenger = false;
-  
+
   late Timer _timer;
   late String _time;
   final Stopwatch _stopwatch = Stopwatch();
@@ -32,23 +33,23 @@ class _HomeState extends State<Home>
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_stopwatch.elapsed.inHours > 0) {
-        setState(() {
-          _time =
-              '${_stopwatch.elapsed.inHours.toString().padLeft(2, '0')}:${_stopwatch.elapsed.inMinutes.toString().padLeft(2, '0')}:${(_stopwatch.elapsed.inSeconds % 60).toString().padLeft(2, '0')}';
-        });
-      } else {
-        setState(() {
-          _time =
-              '${_stopwatch.elapsed.inMinutes.toString().padLeft(2, '0')}:${(_stopwatch.elapsed.inSeconds % 60).toString().padLeft(2, '0')}';
-        });
-      }
-    });
+    // _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    //   if (_stopwatch.elapsed.inHours > 0) {
+    //     setState(() {
+    //       _time =
+    //           '${_stopwatch.elapsed.inHours.toString().padLeft(2, '0')}:${_stopwatch.elapsed.inMinutes.toString().padLeft(2, '0')}:${(_stopwatch.elapsed.inSeconds % 60).toString().padLeft(2, '0')}';
+    //     });
+    //   } else {
+    //     setState(() {
+    //       _time =
+    //           '${_stopwatch.elapsed.inMinutes.toString().padLeft(2, '0')}:${(_stopwatch.elapsed.inSeconds % 60).toString().padLeft(2, '0')}';
+    //     });
+    //   }
+    // });
   }
 
-  void _endRideDialog(){
-      showDialog(
+  void _endRideDialog() {
+    showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Tem certeza que deseja cancelar a corrida ?'),
@@ -133,71 +134,90 @@ class _HomeState extends State<Home>
                         child: Container(
                           width: MediaQuery.of(context).size.width * 0.85,
                           height: MediaQuery.of(context).size.width * 0.20,
-                          child: _foundPassenger ? Container(
-                          width: double.infinity,
-                          height: MediaQuery.of(context).size.height * 0.1,
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(
-                                colors: [
-                                  Color.fromARGB(255, 197, 179, 88),
-                                  Color.fromARGB(255, 238, 205, 39),
-                                ],),
-                          ),
-                          child: Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  "Corrida em Andamento  $_time",
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                          child: _foundPassenger
+                              ? Container(
+                                  width: double.infinity,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.1,
+                                  decoration: const BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Color.fromARGB(255, 197, 179, 88),
+                                        Color.fromARGB(255, 238, 205, 39),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                ElevatedButton.icon(
-                                  onPressed: _endRideDialog,
-                                  icon: const Icon(
-                                    Icons.close,
-                                    color: Colors.white,
-                                  ),
-                                  label: const Text(
-                                    "Cancelar",
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  style: ButtonStyle(
-                                    backgroundColor:
-                                        MaterialStateProperty.all<Color>(Colors
-                                            .red), // Set the background color of the icon
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          "Corrida em Andamento  $_time",
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        ElevatedButton.icon(
+                                          onPressed: _endRideDialog,
+                                          icon: const Icon(
+                                            Icons.close,
+                                            color: Colors.white,
+                                          ),
+                                          label: const Text(
+                                            "Cancelar",
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                          style: ButtonStyle(
+                                            backgroundColor: MaterialStateProperty
+                                                .all<Color>(Colors
+                                                    .red), // Set the background color of the icon
+                                          ),
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 )
-                              ],
-                            ),
-                          ),
-                        )
-                      
-                     : ElevatedButton.icon(
-                            onPressed: () {
-                              _foundPassenger = false;
-                              _activityMode = false;
-                            },
-                            icon: const Icon(
-                              size: 30,
-                              Icons.motorcycle,
-                            ),
-                            label: const Text(
-                              "Encerrar as Atividades",
-                              style: TextStyle(fontSize: 25),
-                            ),
-                          ),
+                              : ElevatedButton.icon(
+                                  onPressed: () {
+                                    _foundPassenger = false;
+                                    _activityMode = false;
+                                  },
+                                  icon: const Icon(
+                                    size: 30,
+                                    Icons.motorcycle,
+                                  ),
+                                  label: const Text(
+                                    "Encerrar as Atividades",
+                                    style: TextStyle(fontSize: 25),
+                                  ),
+                                ),
                         ),
                       ),
                     ),
-               
                   ],
                 )
-              : null //ToggleOnline()
-                
-                ),
+              : Center(
+                  child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Iniciar atividades",
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineMedium!
+                            .copyWith(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .inversePrimary)),
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    const ToggleOnline()
+                  ],
+                )) //
+
+          ),
     );
   }
 }
