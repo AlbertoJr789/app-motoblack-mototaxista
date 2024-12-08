@@ -5,6 +5,7 @@ import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:app_motoblack_mototaxista/controllers/activityController.dart';
 import 'package:app_motoblack_mototaxista/models/Agent.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -18,34 +19,32 @@ class ToggleOnline extends StatefulWidget {
 
 class _ToggleOnlineState extends State<ToggleOnline> {
   bool _online = false;
+  String _uuid = '';
 
   late ActivityController _controller;
   late StreamSubscription _stream;
 
   void _toggleOnline(b) async {
     if (b) {
-      await _controller.getOnline();
-      await _stream.cancel();
-      await _listenOnline();
+      _uuid = await _controller.getOnline();
+      if(_uuid.isNotEmpty) _online = true;
+      _listenOnline();
     } else {
-      await _controller.getOffline();
+      _online = await _controller.getOffline();
       await _stream.cancel();
+      setState(() {});
     }
   }
 
    _listenOnline() async {
-    Agent.getUuid().then((value) {
-      print('mimde');
-      print(value);
-      if (value.isNotEmpty) {
-          _stream = FirebaseFirestore.instance.collection('availableAgents').doc(value).snapshots().listen((querySnapshot) {
-            print(querySnapshot);
-            if(querySnapshot.exists){
+    if (_uuid.isEmpty) _uuid = await Agent.getUuid();
+    if (_uuid.isNotEmpty) {
+          _stream = FirebaseDatabase.instance.ref('availableAgents').child(_uuid).onValue.listen((querySnapshot) {
+            if(querySnapshot.snapshot.exists){
               setState(() {
                 _online = true;
               });
             }else{
-              print('nao existe,cancela');
               Agent.setUuid('');
               _stream.cancel();
               setState(() {
@@ -54,7 +53,6 @@ class _ToggleOnlineState extends State<ToggleOnline> {
             }
           });
       }
-    });
   }
 
   @override

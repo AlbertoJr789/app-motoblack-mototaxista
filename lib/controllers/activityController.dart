@@ -15,7 +15,7 @@ class ActivityController {
 
   final ApiClient apiClient = ApiClient.instance;
 
-  Future<bool> getOnline() async {
+  Future<String> getOnline() async {
     var response = null;
     try {
       response = await apiClient.dio.get(
@@ -25,11 +25,11 @@ class ActivityController {
             headers: {'accept': 'application/json'}),
       );
       Agent.setUuid(response.data['message']);
-      return true;
+      return response.data['message'];
     } on DioException catch (e) {
       String message =  e.response?.data['message'] ?? e.toString();
       showAlert(context, "Erro ao iniciar sessão", "Tente novamente mais tarde", message);
-      return false;
+      return '';
     }
   }
 
