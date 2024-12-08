@@ -76,42 +76,7 @@ class _HomeState extends State<Home>
     );
   }
 
-  void _passengerDialog() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title:
-            const Text('Opa! Tem passageiro precisando de corrida! Vai pegar?'),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-            },
-            child: const Text(
-              'Tô fora',
-              style: TextStyle(color: Colors.white),
-            ),
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(
-                  Colors.red), // Set the background color of the icon
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                _stopwatch.reset();
-                _stopwatch.stop();
-                _foundPassenger = true;
-              });
-              Navigator.pop(ctx);
-            },
-            child: const Text('Bora!'),
-          ),
-        ],
-      ),
-    );
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     super.build(context);

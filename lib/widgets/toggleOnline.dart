@@ -45,9 +45,17 @@ class _ToggleOnlineState extends State<ToggleOnline> {
     if (_uuid.isNotEmpty) {
           _stream = FirebaseDatabase.instance.ref('availableAgents').child(_uuid).onValue.listen((querySnapshot) {
             if(querySnapshot.snapshot.exists){
-              setState(() {
-                _online = true;
-              });
+               if(_online == false){
+                setState(() {
+                  _online = true;
+                });
+               }
+               final data = querySnapshot.snapshot.value as Map;
+               final tripSuggestion = data.containsKey('trips') ? data['trips'].firstWhere((element) => element['refused'] == false) : null;
+               if(tripSuggestion != null){
+                  _showTripSuggestion(tripSuggestion);                
+               }
+               
             }else{
               Agent.setUuid('');
               _stream.cancel();
@@ -69,6 +77,38 @@ class _ToggleOnlineState extends State<ToggleOnline> {
         });
       }
     });
+  }
+
+  _showTripSuggestion(tripSuggestion){
+      showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title:
+             Text('Opa! Tem passageiro precisando de corrida! Vai pegar? ' + tripSuggestion['id']),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+            },
+            child: const Text(
+              'Tô fora',
+              style: TextStyle(color: Colors.white),
+            ),
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(
+                  Colors.red), // Set the background color of the icon
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              
+              Navigator.pop(ctx);
+            },
+            child: const Text('Bora!'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
