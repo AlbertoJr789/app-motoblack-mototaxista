@@ -9,6 +9,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:geolocator/geolocator.dart';
 
 class ToggleOnline extends StatefulWidget {
   const ToggleOnline({super.key});
@@ -23,15 +24,18 @@ class _ToggleOnlineState extends State<ToggleOnline> {
 
   late ActivityController _controller;
   late StreamSubscription _stream;
+  late StreamSubscription _locationListener;
 
   void _toggleOnline(b) async {
     if (b) {
       _uuid = await _controller.getOnline();
       if(_uuid.isNotEmpty) _online = true;
       _listenOnline();
+      _listenLocation();
     } else {
       _online = await _controller.getOffline();
-      await _stream.cancel();
+      _stream.cancel();
+      _locationListener.cancel(); 
       setState(() {});
     }
   }
@@ -47,6 +51,7 @@ class _ToggleOnlineState extends State<ToggleOnline> {
             }else{
               Agent.setUuid('');
               _stream.cancel();
+              _locationListener.cancel();
               setState(() {
                 _online = false;
               });
@@ -55,10 +60,22 @@ class _ToggleOnlineState extends State<ToggleOnline> {
       }
   }
 
+  _listenLocation() {
+    _locationListener = Geolocator.getPositionStream().listen((Position position) {
+      if(_online){
+         FirebaseDatabase.instance.ref('availableAgents').child(_uuid).update({
+          'latitude': position.latitude,
+          'longitude': position.longitude
+        });
+      }
+    });
+  }
+
   @override
   initState() {
     super.initState();
     _listenOnline();  
+    _listenLocation();
   }
 
   @override
