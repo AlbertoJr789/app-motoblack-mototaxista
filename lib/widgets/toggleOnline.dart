@@ -3,8 +3,9 @@ import 'dart:math';
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:app_motoblack_mototaxista/controllers/activityController.dart';
+import 'package:app_motoblack_mototaxista/models/Activity.dart';
 import 'package:app_motoblack_mototaxista/models/Agent.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:app_motoblack_mototaxista/widgets/activitySuggestion.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ class ToggleOnline extends StatefulWidget {
 class _ToggleOnlineState extends State<ToggleOnline> {
   bool _online = false;
   String _uuid = '';
+  bool _suggesting = false;
 
   late ActivityController _controller;
   late StreamSubscription _stream;
@@ -29,62 +31,76 @@ class _ToggleOnlineState extends State<ToggleOnline> {
   void _toggleOnline(b) async {
     if (b) {
       _uuid = await _controller.getOnline();
-      if(_uuid.isNotEmpty) _online = true;
+      if (_uuid.isNotEmpty) _online = true;
       _listenOnline();
       _listenLocation();
     } else {
       _online = await _controller.getOffline();
       _stream.cancel();
-      _locationListener.cancel(); 
+      _locationListener.cancel();
       setState(() {});
     }
   }
 
-   _listenOnline() async {
+  _listenOnline() async {
     if (_uuid.isEmpty) _uuid = await Agent.getUuid();
     if (_uuid.isNotEmpty) {
-          _stream = FirebaseDatabase.instance.ref('availableAgents').child(_uuid).onValue.listen((querySnapshot) {
-            if(querySnapshot.snapshot.exists){
-               if(_online == false){
-                setState(() {
-                  _online = true;
-                });
-               }
-               final data = querySnapshot.snapshot.value as Map;
-               final tripSuggestion = data.containsKey('trips') ? data['trips'].firstWhere((element) => element['refused'] == false) : null;
-               if(tripSuggestion != null){
-                  _showTripSuggestion(tripSuggestion);                
-               }
-               
-            }else{
-              Agent.setUuid('');
-              _stream.cancel();
-              _locationListener.cancel();
-              setState(() {
-                _online = false;
-              });
+      _stream = FirebaseDatabase.instance
+          .ref('availableAgents')
+          .child(_uuid)
+          .onValue
+          .listen((querySnapshot) {
+        if (querySnapshot.snapshot.exists) {
+          if (_online == false) {
+            setState(() {
+              _online = true;
+            });
+          }
+          if (!_suggesting) {
+            final data = querySnapshot.snapshot.value as Map;
+            if (data.containsKey('trips')) {
+              final trips = data['trips'];
+              final tripSuggestion =
+                  trips.firstWhere((element) => element['refused'] == false);
+              if (tripSuggestion != null) {
+                _showTripSuggestion(tripSuggestion['id']);
+              }
             }
+          }
+        } else {
+          Agent.setUuid('');
+          _stream.cancel();
+          _locationListener.cancel();
+          setState(() {
+            _online = false;
           });
-      }
+        }
+      });
+    }
   }
 
   _listenLocation() {
-    _locationListener = Geolocator.getPositionStream().listen((Position position) {
-      if(_online){
-         FirebaseDatabase.instance.ref('availableAgents').child(_uuid).update({
-          'latitude': position.latitude,
-          'longitude': position.longitude
-        });
-      }
-    });
+    // _locationListener = Geolocator.getPositionStream().listen((Position position) {
+    //   if(_online){
+    //      FirebaseDatabase.instance.ref('availableAgents').child(_uuid).update({
+    //       'latitude': position.latitude,
+    //       'longitude': position.longitude
+    //     });
+    //   }
+    // });
   }
 
-  _showTripSuggestion(tripSuggestion){
-      showDialog(
+  _showTripSuggestion(tripId) async {
+    _suggesting = true;
+    Activity? activity = await Activity.getApi(tripId);
+    if(activity == null){
+      _suggesting = false;
+      return;
+    }
+    showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title:
-             Text('Opa! Tem passageiro precisando de corrida! Vai pegar? ' + tripSuggestion['id']),
+        title: ActivitySuggestion(activity: activity),
         actions: [
           ElevatedButton(
             onPressed: () {
@@ -101,7 +117,6 @@ class _ToggleOnlineState extends State<ToggleOnline> {
           ),
           ElevatedButton(
             onPressed: () {
-              
               Navigator.pop(ctx);
             },
             child: const Text('Bora!'),
@@ -114,7 +129,7 @@ class _ToggleOnlineState extends State<ToggleOnline> {
   @override
   initState() {
     super.initState();
-    _listenOnline();  
+    _listenOnline();
     _listenLocation();
   }
 
@@ -158,11 +173,9 @@ class _ToggleOnlineState extends State<ToggleOnline> {
     );
   }
 
-
   @override
   void dispose() {
     super.dispose();
     _stream.cancel();
   }
-
 }

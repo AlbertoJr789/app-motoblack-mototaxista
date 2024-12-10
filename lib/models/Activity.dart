@@ -1,6 +1,6 @@
 import 'package:app_motoblack_mototaxista/controllers/apiClient.dart';
 import 'package:app_motoblack_mototaxista/models/Address.dart';
-import 'package:app_motoblack_mototaxista/models/Agent.dart';
+import 'package:app_motoblack_mototaxista/models/Passenger.dart';
 import 'package:app_motoblack_mototaxista/models/Vehicle.dart';
 import 'package:dio/dio.dart';
 
@@ -23,7 +23,7 @@ class Activity {
   int? id;
   String? uuid;
   ActivityType type;
-  Agent? agent;
+  Passenger? passenger;
   Vehicle? vehicle;
   Address origin;
   Address destiny;
@@ -42,7 +42,7 @@ class Activity {
       {this.id,
        this.uuid,
        required this.type,
-       this.agent,
+       this.passenger,
        this.vehicle,
       required this.origin,
       required this.destiny,
@@ -60,7 +60,7 @@ class Activity {
         id: map['id'],
         uuid: map['uuid'],
         type: activityTypeToEnum(map['type']['tipo']),
-        agent: map['agent'] != null ? Agent.fromJson(map['agent']) : null,
+        passenger: map['passenger'] != null ? Passenger.fromJson(map['passenger']) : null,
         vehicle: map['vehicle'] != null ? Vehicle.fromJson(map['vehicle']) : null,
         origin: Address.fromJson(map['origin']),
         destiny: Address.fromJson(map['destiny']),
@@ -93,6 +93,24 @@ class Activity {
     }
   }
 
+  static Future<Activity?> getApi(id) async {
+    try{
+      var response = await apiClient.dio.get(
+          '/api/activity/$id',
+          options: Options(
+            contentType: Headers.jsonContentType,
+            headers: {
+              'accept': 'application/json',
+            },
+          ),
+        );
+
+        return Activity.fromJson(response.data['data']);
+    }catch(e){
+      return null;
+    }
+  }
+
   static Future<Response> getActivities(int page) async {
     return await apiClient.dio.get(
         '/api/activity',
@@ -118,6 +136,8 @@ class Activity {
         data: data,
       );
   }
+
+
 
 
 }

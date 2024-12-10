@@ -1,6 +1,7 @@
 import 'package:app_motoblack_mototaxista/controllers/apiClient.dart';
 import 'package:app_motoblack_mototaxista/main.dart';
 import 'package:app_motoblack_mototaxista/models/Agent.dart';
+import 'package:app_motoblack_mototaxista/models/Passenger.dart';
 import 'package:app_motoblack_mototaxista/screens/login.dart';
 import 'package:app_motoblack_mototaxista/util/util.dart';
 import 'package:dio/dio.dart';
