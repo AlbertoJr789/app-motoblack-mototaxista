@@ -6,10 +6,12 @@ import 'package:app_motoblack_mototaxista/controllers/activityController.dart';
 import 'package:app_motoblack_mototaxista/models/Activity.dart';
 import 'package:app_motoblack_mototaxista/models/Agent.dart';
 import 'package:app_motoblack_mototaxista/widgets/activitySuggestion.dart';
+import 'package:app_motoblack_mototaxista/widgets/assets.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 
 class ToggleOnline extends StatefulWidget {
@@ -23,6 +25,7 @@ class _ToggleOnlineState extends State<ToggleOnline> {
   bool _online = false;
   String _uuid = '';
   bool _suggesting = false;
+  bool _acceptingTrip = false;
 
   late ActivityController _controller;
   late StreamSubscription _stream;
@@ -93,36 +96,88 @@ class _ToggleOnlineState extends State<ToggleOnline> {
   _showTripSuggestion(tripId) async {
     _suggesting = true;
     Activity? activity = await Activity.getApi(tripId);
-    if(activity == null){
+    if (activity == null) {
       _suggesting = false;
       return;
     }
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: ActivitySuggestion(activity: activity),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-            },
-            child: const Text(
-              'Tô fora',
-              style: TextStyle(color: Colors.white),
+      builder: (ctx) => StatefulBuilder(builder: (context, setState) {
+        return AlertDialog(
+          title: ActivitySuggestion(activity: activity),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                _controller.refuseTrip(tripId);
+                Navigator.pop(ctx);
+              },
+              child: const Text(
+                'Tô fora',
+                style: TextStyle(color: Colors.white),
+              ),
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(
+                    Colors.red), // Set the background color of the icon
+              ),
             ),
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(
-                  Colors.red), // Set the background color of the icon
+            ElevatedButton(
+              onPressed: () async {
+                setState(() {
+                  _acceptingTrip = true;
+                });
+                bool ret = await _controller.acceptTrip(tripId);
+                if (!ret) {
+                  setState(() {
+                     _acceptingTrip = false;
+                  });
+                  FToast().init(context).showToast(
+                      child: MyToast(
+                        msg: const Text(
+                          'Erro ao aceitar corrida, tente novamente.',
+                          style: const TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                        icon: const Icon(
+                          Icons.error,
+                          color: Colors.white,
+                        ),
+                        color: Colors.redAccent,
+                      ),
+                      gravity: ToastGravity.BOTTOM,
+                      toastDuration: const Duration(seconds: 5));
+                } else {
+                  Navigator.pop(context);
+                  FToast().init(context).showToast(
+                      child: MyToast(
+                        msg: const Text(
+                          'Aceite feito com sucesso, inicializando mapa...',
+                          style: const TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                        icon: const Icon(
+                          Icons.error,
+                          color: Colors.white,
+                        ),
+                        color: Colors.greenAccent,
+                      ),
+                      gravity: ToastGravity.BOTTOM,
+                      toastDuration: const Duration(seconds: 5));
+                }
+              },
+              child: _acceptingTrip
+                  ? const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: CircularProgressIndicator(
+                        color: Colors.black,
+                      ),
+                    )
+                  : const Text('Bora!'),
             ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-            },
-            child: const Text('Bora!'),
-          ),
-        ],
-      ),
+          ],
+        );
+      }),
     );
   }
 

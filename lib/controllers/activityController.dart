@@ -53,5 +53,29 @@ class ActivityController {
     }
   }
   
+  Future<bool> acceptTrip(id) async {
+    var response = null;
+    try {
+      response = await apiClient.dio.patch(
+        '/api/acceptTrip/$id',
+        options: Options(
+            contentType: Headers.jsonContentType,
+            headers: {'accept': 'application/json'}),
+      );
+      return true;
+    } on DioException catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> refuseTrip(id) async {
+    var response = null;
+    try {
+      
+      return true;
+    } on DioException catch (e) {
+      return false;
+    }
+  }
 
 }

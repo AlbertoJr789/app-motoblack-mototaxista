@@ -21,11 +21,11 @@ class ActivitySuggestion extends StatelessWidget {
           child: Column(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(25.0),
+                borderRadius: BorderRadius.circular(50.0),
                 child: CachedNetworkImage(
                     fit: BoxFit.cover,
-                    width: 75,
-                    height: 75,
+                    width: 100,
+                    height: 100,
                     placeholder: (context, url) =>
                         const CircularProgressIndicator(),
                     errorWidget: (context, url, error) => const Icon(
