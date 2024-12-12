@@ -1,18 +1,22 @@
 import 'package:app_motoblack_mototaxista/controllers/apiClient.dart';
 import 'package:app_motoblack_mototaxista/main.dart';
 import 'package:app_motoblack_mototaxista/models/Activity.dart';
+import 'package:app_motoblack_mototaxista/models/Address.dart';
 import 'package:app_motoblack_mototaxista/models/Agent.dart';
 import 'package:app_motoblack_mototaxista/models/Passenger.dart';
 import 'package:app_motoblack_mototaxista/screens/login.dart';
 import 'package:app_motoblack_mototaxista/util/util.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ActivityController extends ChangeNotifier {
 
   final ApiClient apiClient = ApiClient.instance;
   Activity? currentActivity;
+  Position? currentLocation;
 
   Future<String> getOnline() async {
     var response = null;

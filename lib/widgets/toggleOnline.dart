@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:app_motoblack_mototaxista/controllers/activityController.dart';
 import 'package:app_motoblack_mototaxista/models/Activity.dart';
+import 'package:app_motoblack_mototaxista/models/Address.dart';
 import 'package:app_motoblack_mototaxista/models/Agent.dart';
 import 'package:app_motoblack_mototaxista/util/util.dart';
 import 'package:app_motoblack_mototaxista/widgets/activitySuggestion.dart';
@@ -14,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
 class ToggleOnline extends StatefulWidget {
@@ -32,6 +34,7 @@ class _ToggleOnlineState extends State<ToggleOnline> {
   late ActivityController _controller;
   late StreamSubscription _stream;
   late StreamSubscription _locationListener;
+  late Position _currentLocation;
 
   void _toggleOnline(b) async {
     if (b) {
@@ -90,14 +93,16 @@ class _ToggleOnlineState extends State<ToggleOnline> {
   }
 
   _listenLocation() {
-    // _locationListener = Geolocator.getPositionStream().listen((Position position) {
-    //   if(_online){
-    //      FirebaseDatabase.instance.ref('availableAgents').child(_uuid).update({
-    //       'latitude': position.latitude,
-    //       'longitude': position.longitude
-    //     });
-    //   }
-    // });
+    _locationListener = Geolocator.getPositionStream().listen((Position position) {
+      _currentLocation = position;
+      if(_online){
+         FirebaseDatabase.instance.ref('availableAgents').child(_uuid).update({
+          'latitude': position.latitude,
+          'longitude': position.longitude
+        });
+      }
+      _locationListener.cancel();
+    });
   }
 
   _showTripSuggestion(tripId) async {
@@ -132,6 +137,7 @@ class _ToggleOnlineState extends State<ToggleOnline> {
                 setState(() {
                   _acceptingTrip = true;
                 });
+                _controller.currentLocation = _currentLocation;
                 bool ret = await _controller.acceptTrip(activity);
                 if (!ret) {
                   setState(() {

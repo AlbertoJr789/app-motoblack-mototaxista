@@ -35,7 +35,7 @@ class _HomeState extends State<Home>
       body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: _tripController.currentActivity != null
-              ? Trip(activity: _tripController.currentActivity!)
+              ? const Trip()
               : Center(
                   child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

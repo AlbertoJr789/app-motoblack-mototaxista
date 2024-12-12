@@ -2,39 +2,45 @@ import 'dart:async';
 
 import 'package:app_motoblack_mototaxista/controllers/activityController.dart';
 import 'package:app_motoblack_mototaxista/models/Activity.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 
 class Trip extends StatefulWidget {
-  final Activity activity;
-
-  const Trip({super.key, required this.activity});
+  const Trip({super.key});
 
   @override
   State<Trip> createState() => _TripState();
 }
 
 class _TripState extends State<Trip> {
-  final ActivityController _controller = ActivityController();
-
-  late Timer _timer;
-  String _time = '';
-  final Stopwatch _stopwatch = Stopwatch();
+  late ActivityController _controller;
+  final List<Marker> _markers = [];
 
   @override
   initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_stopwatch.elapsed.inHours > 0) {
-        setState(() {
-          _time =
-              '${_stopwatch.elapsed.inHours.toString().padLeft(2, '0')}:${_stopwatch.elapsed.inMinutes.toString().padLeft(2, '0')}:${(_stopwatch.elapsed.inSeconds % 60).toString().padLeft(2, '0')}';
-        });
-      } else {
-        setState(() {
-          _time =
-              '${_stopwatch.elapsed.inMinutes.toString().padLeft(2, '0')}:${(_stopwatch.elapsed.inSeconds % 60).toString().padLeft(2, '0')}';
-        });
+    _controller = Provider.of<ActivityController>(context, listen: false);
+    _listenTrip();
+  }
+
+  _listenTrip() {
+    FirebaseDatabase.instance
+        .ref('trips')
+        .child(_controller.currentActivity!.uuid!)
+        .onValue
+        .listen((querySnapshot) {
+      if (querySnapshot.snapshot.exists) {
+        final data = querySnapshot.snapshot.value as Map;
+        _markers.clear();
+        _markers.add(Marker(
+          markerId: MarkerId('passenger'),
+          position: LatLng(
+              data['passenger']['latitude'],
+              data['passenger']['longitude']),
+        ));
+        setState(() {});
       }
     });
   }
@@ -43,61 +49,35 @@ class _TripState extends State<Trip> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        const GoogleMap(
-          initialCameraPosition:
-              CameraPosition(target: LatLng(-11, -12), zoom: 16),
+        GoogleMap(
+          myLocationEnabled: true,
+          myLocationButtonEnabled: true,
+          initialCameraPosition: CameraPosition(
+              target: LatLng(_controller.currentActivity!.origin.latitude!,
+                  _controller.currentActivity!.origin.longitude!),
+              zoom: 16),
+          markers: Set<Marker>.of(_markers),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 24.0),
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: Container(
-                width: MediaQuery.of(context).size.width * 0.85,
-                height: MediaQuery.of(context).size.width * 0.20,
-                child: Container(
-                  width: double.infinity,
-                  height: MediaQuery.of(context).size.height * 0.1,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Color.fromARGB(255, 197, 179, 88),
-                        Color.fromARGB(255, 238, 205, 39),
-                      ],
-                    ),
-                  ),
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "Corrida em Andamento  $_time",
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        ElevatedButton.icon(
-                          onPressed: _endRideDialog,
-                          icon: const Icon(
-                            Icons.close,
-                            color: Colors.white,
-                          ),
-                          label: const Text(
-                            "Cancelar",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                                Colors
-                                    .red), // Set the background color of the icon
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                )),
-          ),
-        ),
+        Positioned(
+            bottom: 10,
+            right: MediaQuery.of(context).size.width * 0.33,
+            child: Center(
+              child: ElevatedButton.icon(
+                onPressed: _endRideDialog,
+                icon: const Icon(
+                  Icons.close,
+                  color: Colors.white,
+                ),
+                label: const Text(
+                  "Cancelar",
+                  style: TextStyle(color: Colors.white),
+                ),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                      Colors.red), // Set the background color of the icon
+                ),
+              ),
+            )),
       ],
     );
   }
@@ -116,10 +96,6 @@ class _TripState extends State<Trip> {
           ),
           ElevatedButton(
             onPressed: () {
-              setState(() {
-                _stopwatch.reset();
-                _stopwatch.stop();
-              });
               Navigator.pop(ctx);
             },
             child: const Text('Sim'),
@@ -127,12 +103,5 @@ class _TripState extends State<Trip> {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    _stopwatch.stop();
-    super.dispose();
   }
 }
