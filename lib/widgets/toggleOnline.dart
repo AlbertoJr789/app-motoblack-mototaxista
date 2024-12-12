@@ -5,6 +5,7 @@ import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:app_motoblack_mototaxista/controllers/activityController.dart';
 import 'package:app_motoblack_mototaxista/models/Activity.dart';
 import 'package:app_motoblack_mototaxista/models/Agent.dart';
+import 'package:app_motoblack_mototaxista/util/util.dart';
 import 'package:app_motoblack_mototaxista/widgets/activitySuggestion.dart';
 import 'package:app_motoblack_mototaxista/widgets/assets.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -13,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
 
 class ToggleOnline extends StatefulWidget {
   const ToggleOnline({super.key});
@@ -34,9 +36,14 @@ class _ToggleOnlineState extends State<ToggleOnline> {
   void _toggleOnline(b) async {
     if (b) {
       _uuid = await _controller.getOnline();
-      if (_uuid.isNotEmpty) _online = true;
-      _listenOnline();
-      _listenLocation();
+      if (_uuid.isNotEmpty) {
+        _online = true;
+        _listenOnline();
+        _listenLocation();
+      } else {
+        showAlert(context, "Erro ao iniciar sessão",
+            "Tente novamente mais tarde", '');
+      }
     } else {
       _online = await _controller.getOffline();
       _stream.cancel();
@@ -108,16 +115,16 @@ class _ToggleOnlineState extends State<ToggleOnline> {
           actions: [
             ElevatedButton(
               onPressed: () {
-                _controller.refuseTrip(tripId);
+                _controller.refuseTrip(_uuid);
                 Navigator.pop(ctx);
               },
-              child: const Text(
-                'Tô fora',
-                style: TextStyle(color: Colors.white),
-              ),
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(
                     Colors.red), // Set the background color of the icon
+              ),
+              child: const Text(
+                'Tô fora',
+                style: TextStyle(color: Colors.white),
               ),
             ),
             ElevatedButton(
@@ -125,10 +132,10 @@ class _ToggleOnlineState extends State<ToggleOnline> {
                 setState(() {
                   _acceptingTrip = true;
                 });
-                bool ret = await _controller.acceptTrip(tripId);
+                bool ret = await _controller.acceptTrip(activity);
                 if (!ret) {
                   setState(() {
-                     _acceptingTrip = false;
+                    _acceptingTrip = false;
                   });
                   FToast().init(context).showToast(
                       child: MyToast(
@@ -186,11 +193,11 @@ class _ToggleOnlineState extends State<ToggleOnline> {
     super.initState();
     _listenOnline();
     _listenLocation();
+    _controller = Provider.of<ActivityController>(context, listen: false);
   }
 
   @override
   Widget build(BuildContext context) {
-    _controller = ActivityController(context);
     return AnimatedToggleSwitch<bool>.dual(
       current: _online,
       first: false,

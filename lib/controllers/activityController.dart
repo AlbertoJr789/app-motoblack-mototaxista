@@ -1,5 +1,6 @@
 import 'package:app_motoblack_mototaxista/controllers/apiClient.dart';
 import 'package:app_motoblack_mototaxista/main.dart';
+import 'package:app_motoblack_mototaxista/models/Activity.dart';
 import 'package:app_motoblack_mototaxista/models/Agent.dart';
 import 'package:app_motoblack_mototaxista/models/Passenger.dart';
 import 'package:app_motoblack_mototaxista/screens/login.dart';
@@ -8,13 +9,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ActivityController {
-
-  BuildContext context;
-
-  ActivityController(this.context);
+class ActivityController extends ChangeNotifier {
 
   final ApiClient apiClient = ApiClient.instance;
+  Activity? currentActivity;
 
   Future<String> getOnline() async {
     var response = null;
@@ -28,8 +26,6 @@ class ActivityController {
       Agent.setUuid(response.data['message']);
       return response.data['message'];
     } on DioException catch (e) {
-      String message =  e.response?.data['message'] ?? e.toString();
-      showAlert(context, "Erro ao iniciar sessão", "Tente novamente mais tarde", message);
       return '';
     }
   }
@@ -47,21 +43,21 @@ class ActivityController {
       Agent.setUuid('');
       return false;
     } on DioException catch (e) {
-      String message =  e.response?.data['message'] ?? e.toString();
-      showAlert(context, "Erro ao finalizar sessão", "Tente novamente mais tarde", message);
       return true;
     }
   }
   
-  Future<bool> acceptTrip(id) async {
+  Future<bool> acceptTrip(Activity activity) async {
     var response = null;
     try {
       response = await apiClient.dio.patch(
-        '/api/acceptTrip/$id',
+        '/api/acceptTrip/${activity.id}',
         options: Options(
             contentType: Headers.jsonContentType,
             headers: {'accept': 'application/json'}),
       );
+      currentActivity = activity;
+      notifyListeners();
       return true;
     } on DioException catch (e) {
       return false;
