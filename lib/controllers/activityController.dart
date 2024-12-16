@@ -78,4 +78,32 @@ class ActivityController extends ChangeNotifier {
     }
   }
 
+   Future<bool> cancelActivity({Activity? trip,String? reason,bool alreadyCancelled=false}) async {
+    try {
+
+      if(alreadyCancelled){ //if it was cancelled from somewhere else
+        currentActivity = null;
+        notifyListeners();
+        return true;
+      }
+
+      Response response = await apiClient.dio.post(
+        '/api/cancel/${trip!.id}',
+        options: Options(
+          headers: {
+            'accept': 'application/json',
+          },
+        ),
+        data: {'reason': reason}
+      );
+      currentActivity = null;
+      notifyListeners();
+      return true;
+    } on DioException catch (e) {
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
 }

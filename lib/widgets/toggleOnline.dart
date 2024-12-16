@@ -47,6 +47,7 @@ class _ToggleOnlineState extends State<ToggleOnline> {
         showAlert(context, "Erro ao iniciar sessão",
             "Tente novamente mais tarde", '');
       }
+      setState(() {});
     } else {
       _online = await _controller.getOffline();
       _stream.cancel();
