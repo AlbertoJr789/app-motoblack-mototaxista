@@ -101,9 +101,8 @@ class _ToggleOnlineState extends State<ToggleOnline> {
           'latitude': position.latitude,
           'longitude': position.longitude
         });
-      }
-      _locationListener.cancel();
-    });
+        }
+      });
   }
 
   _showTripSuggestion(tripId) async {
