@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:app_motoblack_mototaxista/controllers/activityController.dart';
 import 'package:app_motoblack_mototaxista/models/Activity.dart';
 import 'package:app_motoblack_mototaxista/widgets/assets.dart';
+import 'package:app_motoblack_mototaxista/widgets/tripIcon.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
@@ -20,12 +23,26 @@ class _TripState extends State<Trip> {
   late ActivityController _controller;
   late StreamSubscription _stream;
   final List<Marker> _markers = [];
+  BitmapDescriptor? _passengerIcon;
 
   @override
   initState() {
     super.initState();
     _controller = Provider.of<ActivityController>(context, listen: false);
+    _createMarkerIcon();
     _listenTrip();
+  }
+
+  void _createMarkerIcon() async {
+    try {
+      // final Uint8List markerIcon = await createImageFromWidget(TripIcon(avatar: _controller.currentActivity!.passenger!.avatar),waitToRender: const Duration(milliseconds: 300));
+
+      // _passengerIcon = BitmapDescriptor.bytes(markerIcon,width: 24,height: 24);
+      setState(() {});
+    } catch (e) {
+      _passengerIcon = BitmapDescriptor.defaultMarker;
+      setState(() {});
+    }
   }
 
   _listenTrip() {
@@ -37,7 +54,7 @@ class _TripState extends State<Trip> {
       if (querySnapshot.snapshot.exists) {
         final data = querySnapshot.snapshot.value as Map;
         
-        if(data['cancelled'] == true){
+        if(data['cancelled'] == true && data['whoCancelled'] == 'p'){
           _controller.cancelActivity(alreadyCancelled: true);
           _stream.cancel();
              showDialog(
@@ -66,10 +83,11 @@ class _TripState extends State<Trip> {
         
         _markers.clear();
         _markers.add(Marker(
-          markerId: MarkerId('passenger'),
+          markerId: const MarkerId('passenger'),
           position: LatLng(
               data['passenger']['latitude'],
               data['passenger']['longitude']),
+          icon: _passengerIcon!,
         ));
         setState(() {});
       }
@@ -80,15 +98,17 @@ class _TripState extends State<Trip> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        GoogleMap(
-          myLocationEnabled: true,
-          myLocationButtonEnabled: true,
-          initialCameraPosition: CameraPosition(
-              target: LatLng(_controller.currentActivity!.origin.latitude!,
-                  _controller.currentActivity!.origin.longitude!),
-              zoom: 16),
-          markers: Set<Marker>.of(_markers),
-        ),
+        SizedBox(height: 40,width: 40,),
+        TripIcon(avatar: _controller.currentActivity!.passenger!.avatar),
+        // GoogleMap(
+        //   myLocationEnabled: true,
+        //   myLocationButtonEnabled: true,
+        //   initialCameraPosition: CameraPosition(
+        //       target: LatLng(_controller.currentActivity!.origin.latitude!,
+        //           _controller.currentActivity!.origin.longitude!),
+        //       zoom: 16),
+        //   markers: Set<Marker>.of(_markers),
+        // ),
         Positioned(
             bottom: 10,
             right: MediaQuery.of(context).size.width * 0.33,
