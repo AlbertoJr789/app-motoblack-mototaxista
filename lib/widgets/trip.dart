@@ -5,6 +5,7 @@ import 'package:app_motoblack_mototaxista/controllers/activityController.dart';
 import 'package:app_motoblack_mototaxista/models/Activity.dart';
 import 'package:app_motoblack_mototaxista/widgets/assets.dart';
 import 'package:app_motoblack_mototaxista/widgets/tripIcon.dart';
+import 'package:custom_map_markers/custom_map_markers.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -35,9 +36,7 @@ class _TripState extends State<Trip> {
 
   void _createMarkerIcon() async {
     try {
-      // final Uint8List markerIcon = await createImageFromWidget(TripIcon(avatar: _controller.currentActivity!.passenger!.avatar),waitToRender: const Duration(milliseconds: 300));
-
-      // _passengerIcon = BitmapDescriptor.bytes(markerIcon,width: 24,height: 24);
+      _passengerIcon = await getMarkerImageFromUrl(_controller.currentActivity!.passenger!.avatar!,targetWidth: 60);
       setState(() {});
     } catch (e) {
       _passengerIcon = BitmapDescriptor.defaultMarker;
@@ -98,17 +97,15 @@ class _TripState extends State<Trip> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        SizedBox(height: 40,width: 40,),
-        TripIcon(avatar: _controller.currentActivity!.passenger!.avatar),
-        // GoogleMap(
-        //   myLocationEnabled: true,
-        //   myLocationButtonEnabled: true,
-        //   initialCameraPosition: CameraPosition(
-        //       target: LatLng(_controller.currentActivity!.origin.latitude!,
-        //           _controller.currentActivity!.origin.longitude!),
-        //       zoom: 16),
-        //   markers: Set<Marker>.of(_markers),
-        // ),
+        GoogleMap(
+          myLocationEnabled: true,
+          myLocationButtonEnabled: true,
+          initialCameraPosition: CameraPosition(
+              target: LatLng(_controller.currentActivity!.origin.latitude!,
+                  _controller.currentActivity!.origin.longitude!),
+              zoom: 16),
+          markers: Set<Marker>.of(_markers),
+        ),
         Positioned(
             bottom: 10,
             right: MediaQuery.of(context).size.width * 0.33,
