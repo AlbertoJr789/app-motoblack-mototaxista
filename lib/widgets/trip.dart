@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:app_motoblack_mototaxista/controllers/activityController.dart';
+import 'package:app_motoblack_mototaxista/controllers/apiClient.dart';
 import 'package:app_motoblack_mototaxista/models/Activity.dart';
 import 'package:app_motoblack_mototaxista/widgets/assets.dart';
 import 'package:app_motoblack_mototaxista/widgets/tripIcon.dart';
-import 'package:custom_map_markers/custom_map_markers.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -36,7 +36,8 @@ class _TripState extends State<Trip> {
 
   void _createMarkerIcon() async {
     try {
-      _passengerIcon = await getMarkerImageFromUrl(_controller.currentActivity!.passenger!.avatar!,targetWidth: 60);
+      final String url = '${ApiClient.instance.baseUrl}/api/marker/${_controller.currentActivity!.passenger!.userId}';
+      _passengerIcon = await getMarkerImageFromUrl(url,targetWidth: 120);
       setState(() {});
     } catch (e) {
       _passengerIcon = BitmapDescriptor.defaultMarker;
@@ -87,6 +88,9 @@ class _TripState extends State<Trip> {
               data['passenger']['latitude'],
               data['passenger']['longitude']),
           icon: _passengerIcon!,
+          infoWindow: const InfoWindow(
+            title: 'Seu Passageiro',
+          ),
         ));
         setState(() {});
       }
