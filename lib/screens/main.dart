@@ -5,7 +5,6 @@ import 'package:app_motoblack_mototaxista/screens/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
 class Main extends StatefulWidget {
   const Main({super.key});
 

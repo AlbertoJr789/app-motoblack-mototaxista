@@ -110,26 +110,26 @@ class _TripState extends State<Trip> {
               zoom: 16),
           markers: Set<Marker>.of(_markers),
         ),
-        Positioned(
-            bottom: 10,
-            right: MediaQuery.of(context).size.width * 0.33,
-            child: Center(
-              child: ElevatedButton.icon(
-                onPressed: _endTripDialog,
-                icon: const Icon(
-                  Icons.close,
-                  color: Colors.white,
-                ),
-                label: const Text(
-                  "Cancelar",
-                  style: TextStyle(color: Colors.white),
-                ),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(
-                      Colors.red), // Set the background color of the icon
-                ),
+        Align(
+          alignment: Alignment.topCenter,
+          child: Center(
+            child: ElevatedButton.icon(
+              onPressed: _endTripDialog,
+              icon: const Icon(
+                Icons.close,
+                color: Colors.white,
               ),
-            )),
+              label: const Text(
+                "Cancelar",
+                style: TextStyle(color: Colors.white),
+              ),
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(
+                    Colors.red), // Set the background color of the icon
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }

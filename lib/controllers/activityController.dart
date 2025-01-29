@@ -1,22 +1,44 @@
 import 'package:app_motoblack_mototaxista/controllers/apiClient.dart';
-import 'package:app_motoblack_mototaxista/main.dart';
 import 'package:app_motoblack_mototaxista/models/Activity.dart';
-import 'package:app_motoblack_mototaxista/models/Address.dart';
 import 'package:app_motoblack_mototaxista/models/Agent.dart';
-import 'package:app_motoblack_mototaxista/models/Passenger.dart';
-import 'package:app_motoblack_mototaxista/screens/login.dart';
-import 'package:app_motoblack_mototaxista/util/util.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ActivityController extends ChangeNotifier {
 
-  final ApiClient apiClient = ApiClient.instance;
+  int _page = 1;
+  bool _hasMore = true;
+  String error = '';
+  List<Activity> activities = [];
   Activity? currentActivity;
+
   Position? currentLocation;
+  static final ApiClient apiClient = ApiClient.instance;
+
+    getActivities() async {
+    try {
+      Response response = await Activity.getActivities(_page);
+      if (response.data['success']) {
+        final data = response.data['data']['result'];
+        _hasMore = response.data['data']['hasMore'];
+        _page++;
+        for (var i = 0; i < data.length; i++) {
+          activities.add(Activity.fromJson(data[i]));
+        }
+      } else {
+        _page = 1;
+        _hasMore = true;
+        throw response.data['message'];
+      }
+      error = '';
+    } catch (e) {
+      error = e.toString();
+    }
+    notifyListeners();
+  }
+
+  bool get hasMore => _hasMore;
 
   Future<String> getOnline() async {
     var response = null;

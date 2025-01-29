@@ -1,5 +1,11 @@
-import 'package:app_motoblack_mototaxista/screens/activityDetails.dart';
+
+
+import 'package:app_motoblack_mototaxista/controllers/activityController.dart';
+import 'package:app_motoblack_mototaxista/widgets/FloatingLoader.dart';
+import 'package:app_motoblack_mototaxista/widgets/activityCard.dart';
+import 'package:app_motoblack_mototaxista/widgets/errorMessage.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Activities extends StatefulWidget {
   const Activities({super.key});
@@ -9,67 +15,76 @@ class Activities extends StatefulWidget {
 }
 
 class _ActivitiesState extends State<Activities> {
+  late ActivityController controller;
+  final ScrollController _scrollController = ScrollController();
+  final _isLoading = ValueNotifier(false);
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+              _scrollController.position.maxScrollExtent &&
+          controller.hasMore) {
+        loadActivities();
+      }
+    });
+    controller = Provider.of<ActivityController>(context, listen: false);
+    loadActivities();
+  }
+
+  loadActivities() async {
+    _isLoading.value = true;
+    await controller.getActivities();
+    _isLoading.value = false;
+  }
+
   @override
   Widget build(BuildContext context) {
+    controller = context.watch<ActivityController>();
+    dynamic message;
+
+    if(controller.error.isNotEmpty){
+        message = ErrorMessage(msg: 'Houve um erro ao tentar obter suas atividades', tryAgainAction: controller.getActivities);
+    }else{
+      if(controller.activities.isEmpty){
+        message = ErrorMessage(msg: 'Você ainda não realizou nenhuma atividade.\nFaça sua primeira corrida!',icon: const Icon(Icons.notes,size: 128,color: Colors.white60,),);
+      }else{
+        message = null;
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Atividades mais recentes'),
-      ),
-      body: ListView.builder(
-        itemCount: 12,
-        itemBuilder: (ctx, index) => Material(
-          color: Colors.transparent,
-          child: InkWell(
-            splashColor: const Color.fromARGB(255, 197, 179, 88),
-            onTap: (){
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ActivityDetails()));
-            },
-            child: Card(
-              shadowColor: const Color.fromARGB(255, 197, 179, 88),
-              color: const Color.fromARGB(243, 221, 221, 219),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(children: [
-                   Container(
-                    width: 100,
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Passageiro',
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 8,),
-                        CircleAvatar(
-                          radius: 30,
-                          backgroundColor: Colors.blue,
-                        )
-                      ],
-                    ),
-                  ),
-                  const Expanded(
-                    child: Column(
-                      // mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Corrida 08/03/2022 10:00'),
-                        Text('Rua Jote Correa 18 - Rua Jote Correa 28 '),
-                      ],
-                    ),
-                  ),
-                  const Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Icon(Icons.arrow_right,color: Colors.black,),
-                    ],
-                  )
-                ]),
-              ),
-            ),
+        title: const Text('Atividades mais recentes'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: loadActivities,
           ),
+        ]
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
+        child: message ?? Stack(
+          children: [
+            ListView.builder(
+                controller: _scrollController,
+                itemCount: controller.activities.length,
+                itemBuilder: (ctx, index) =>
+                    ActivityCard(activity: controller.activities[index])),
+            FloatingLoader(active: _isLoading)
+          ],
         ),
       ),
     );
+  }
+
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _isLoading.dispose();
+    super.dispose();
   }
 }
