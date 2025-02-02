@@ -1,8 +1,11 @@
 // import 'package:app_motoblack_cliente/widgets/help.dart';
 // import 'package:app_motoblack_cliente/widgets/paymentDetails.dart';
 import 'package:app_motoblack_mototaxista/controllers/loginController.dart';
+import 'package:app_motoblack_mototaxista/controllers/vehicleController.dart';
 import 'package:app_motoblack_mototaxista/widgets/profileDetails.dart';
+import 'package:app_motoblack_mototaxista/widgets/vehiclesDetails.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -15,7 +18,7 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 1,
+      length: 2,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Dados Pessoais'),
@@ -49,17 +52,18 @@ class _ProfileState extends State<Profile> {
               Tab(
                 text: 'Info. Conta',
               ),
-              // Tab(
-              //   text: 'Pagamentos',
-              // ),
+              Tab(
+                text: 'Meus Veículos',
+              ),
               // Tab(
               //   text: 'Ajuda',
               // ),
             ],
           ),
         ),
-        body: const TabBarView(children: [
-          ProfileDetails(),
+        body: TabBarView(children: [
+          const ProfileDetails(),
+          ChangeNotifierProvider(create: (context) => VehicleController(), child: const VehiclesDetails()),
           //  PaymentDetails(),
           //  HelpDetails()
         ]),

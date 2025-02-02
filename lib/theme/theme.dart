@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
 const _primaryColor = const Color.fromARGB(255, 197, 179, 88);
 const _sencondaryColor =  const Color.fromARGB(255, 3, 3, 3);
 const _dangerColor = Color.fromARGB(210, 182, 21, 21);
@@ -34,9 +33,19 @@ var kTheme = ThemeData.dark().copyWith(
       ),
     ),
   ),
+  iconButtonTheme: IconButtonThemeData(
+    style: IconButton.styleFrom(
+      foregroundColor: _primaryColor,
+    ),
+  ),
+  radioTheme: RadioThemeData(
+    fillColor: WidgetStateProperty.all(_sencondaryColor),
+  ),
   inputDecorationTheme: const InputDecorationTheme(
     filled: true,
     fillColor: Color.fromARGB(255, 216, 216, 216),
+
+
     border: OutlineInputBorder(
       borderSide: BorderSide(
         color: _sencondaryColor,
@@ -67,6 +76,7 @@ var kTheme = ThemeData.dark().copyWith(
     hintStyle: TextStyle(color: _sencondaryColor, fontSize: 18),
     iconColor: _sencondaryColor,
     prefixIconColor: _sencondaryColor,
+    
   ),
   primaryColor: _primaryColor,
   progressIndicatorTheme: const ProgressIndicatorThemeData(
