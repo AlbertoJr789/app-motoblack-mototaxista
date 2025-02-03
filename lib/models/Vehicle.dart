@@ -84,4 +84,18 @@ class Vehicle {
       );
   }
 
+  static Future<Response> addVehicle(FormData data) async {
+    return await apiClient.dio.post(
+      '/api/vehicle',
+      options: Options(
+        contentType: Headers.multipartFormDataContentType,
+        headers: {
+          'accept': 'application/json',
+        },
+      ),
+      data: data,
+    );
+  }
+
+
 }

@@ -1,6 +1,12 @@
+import 'dart:io';
+
+import 'package:app_motoblack_mototaxista/controllers/vehicleController.dart';
 import 'package:app_motoblack_mototaxista/models/Vehicle.dart';
+import 'package:app_motoblack_mototaxista/widgets/assets.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class AddVehicle extends StatefulWidget {
   const AddVehicle({super.key});
@@ -15,9 +21,12 @@ class _AddVehicleState extends State<AddVehicle> {
   final TextEditingController _brand = TextEditingController();
   final TextEditingController _model = TextEditingController();
   final TextEditingController _plate = TextEditingController();
+  final TextEditingController _documentText = TextEditingController();
   Color _color = Colors.black;
   late VehicleType _type;
-  dynamic _document;
+  late File _document;
+
+  final _controller = VehicleController();
 
   final _formKey = GlobalKey<FormState>();
 
@@ -25,6 +34,51 @@ class _AddVehicleState extends State<AddVehicle> {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isSaving = true;
+      });
+
+      Map<String, dynamic> ret = await _controller.addVehicle(_brand.text, _model.text, _plate.text, _color, _type, _document);
+
+      if (ret['error'] == false) {
+        FToast().init(context).showToast(
+            child: MyToast(
+              msg: const Text(
+                'Veículo adicionado com sucesso.',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+
+              icon: const Icon(
+                Icons.check,
+                color: Colors.white,
+              ),
+              color: Colors.greenAccent,
+            ),
+            gravity: ToastGravity.BOTTOM,
+            toastDuration: const Duration(seconds: 4));
+      } else {
+        FToast().init(context).showToast(
+            child: MyToast(
+              msg: Text(
+                ret['status'] == 422
+                    ? ret['error']
+                    : 'Erro ao adicionar veículo, tente novamente mais tarde.',
+                style: const TextStyle(
+                  color: Colors.white,
+                ),
+
+              ),
+              icon: const Icon(
+                Icons.error,
+                color: Colors.white,
+              ),
+              color: Colors.redAccent,
+            ),
+            gravity: ToastGravity.BOTTOM,
+            toastDuration: const Duration(seconds: 5));
+      }
+      setState(() {
+        _isSaving = false;
       });
     }
   }
@@ -64,7 +118,7 @@ class _AddVehicleState extends State<AddVehicle> {
     return Form(
       key: _formKey,
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.6,
+        height: MediaQuery.of(context).size.height * 0.7,
         color: Theme.of(context).colorScheme.inversePrimary,
         child: SingleChildScrollView(
           child: Center(
@@ -80,7 +134,7 @@ class _AddVehicleState extends State<AddVehicle> {
                         'Novo Veículo',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 4,
                       ),
                       Text(
@@ -123,7 +177,7 @@ class _AddVehicleState extends State<AddVehicle> {
                                                 .inversePrimary,
                                           ),
                                           child: DropdownButtonFormField(
-                                            icon: Icon(
+                                            icon: const Icon(
                                               Icons.arrow_drop_down_outlined,
                                               color: Colors.black,
                                             ),
@@ -150,7 +204,7 @@ class _AddVehicleState extends State<AddVehicle> {
                                       ],
                                     ),
                                   ),
-                                  Expanded(
+                                  const Expanded(
                                     child: SizedBox(),
                                   ),
                                   SizedBox(
@@ -278,6 +332,43 @@ class _AddVehicleState extends State<AddVehicle> {
                                             )),
                                       ],
                                     ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                             Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 6.0, horizontal: 10.0),
+                              child: Column(
+                                children: [
+                                  const SizedBox(
+                                    width: double.infinity,
+                                    child: Text(
+                                      'Documento: ',
+                                      style: TextStyle(
+                                          fontSize: 14, color: Colors.black),
+                                      textAlign: TextAlign.start,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 4,
+                                  ),
+                                  TextFormField(
+                                    readOnly: true,
+                                    controller: _documentText,
+                                    onTap: () async {
+                                      FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png']);
+                                      if (result != null) {
+                                        _document = File(result.files.single.path!);
+                                        _documentText.text = result.files.single.name;
+                                      } 
+                                    },
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Insira um documento';
+                                      }
+                                      return null;
+                                    },
                                   ),
                                 ],
                               ),

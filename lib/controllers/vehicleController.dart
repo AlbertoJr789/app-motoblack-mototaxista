@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:app_motoblack_mototaxista/controllers/apiClient.dart';
 import 'package:app_motoblack_mototaxista/models/Activity.dart';
 import 'package:app_motoblack_mototaxista/models/Agent.dart';
 import 'package:app_motoblack_mototaxista/models/Vehicle.dart';
+import 'package:app_motoblack_mototaxista/widgets/addVehicle.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -14,6 +17,7 @@ class VehicleController extends ChangeNotifier {
   List<Vehicle> vehicles = [];
   Vehicle? currentVehicle;
 
+  static final ApiClient apiClient = ApiClient.instance;
 
   getVehicles() async {
     try {
@@ -38,6 +42,31 @@ class VehicleController extends ChangeNotifier {
   }
 
   bool get hasMore => _hasMore;
+
+  Future<Map<String,dynamic>> addVehicle(String brand,String model,String plate,Color color,VehicleType type,File document) async {
+    try {
+      FormData data = FormData.fromMap({
+        'brand': brand,
+        'model': model,
+        'plate': plate,
+        'color': '#${color.value.toRadixString(16)}',
+        'type': type.index + 1,
+        'document': await MultipartFile.fromFile(document.path)
+      });
+
+      Response response = await Vehicle.addVehicle(data);
+      if (response.data['success']) {
+        return {"error": false};
+      } else {
+        return {"error": response.data['message'],"status": response.statusCode};
+      }
+    } on DioException catch (e) {
+      return {"error": e.response!.data['message'],"status": e.response!.statusCode};
+    } catch (e) {
+      return {"error": e.toString(),"status": 500};
+    }
+  }
+
 
 
 
