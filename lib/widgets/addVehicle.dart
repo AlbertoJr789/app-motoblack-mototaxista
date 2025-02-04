@@ -9,7 +9,10 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class AddVehicle extends StatefulWidget {
-  const AddVehicle({super.key});
+  const AddVehicle({super.key, required this.onAdded});
+
+  final Function() onAdded;
+
 
   @override
   State<AddVehicle> createState() => _AddVehicleState();
@@ -56,6 +59,8 @@ class _AddVehicleState extends State<AddVehicle> {
             ),
             gravity: ToastGravity.BOTTOM,
             toastDuration: const Duration(seconds: 4));
+
+        widget.onAdded();
       } else {
         FToast().init(context).showToast(
             child: MyToast(
@@ -118,9 +123,13 @@ class _AddVehicleState extends State<AddVehicle> {
     return Form(
       key: _formKey,
       child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.inversePrimary,
+          borderRadius: BorderRadius.circular(10),
+        ),
         height: MediaQuery.of(context).size.height * 0.7,
-        color: Theme.of(context).colorScheme.inversePrimary,
         child: SingleChildScrollView(
+
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

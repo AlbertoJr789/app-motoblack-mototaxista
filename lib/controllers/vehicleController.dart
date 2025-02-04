@@ -19,9 +19,17 @@ class VehicleController extends ChangeNotifier {
 
   static final ApiClient apiClient = ApiClient.instance;
 
-  getVehicles() async {
+  getVehicles(bool reset) async {
     try {
+
+      if(reset){
+        _page = 1;
+        _hasMore = true;
+        vehicles = [];
+      }
+
       Response response = await Vehicle.getVehicles(_page);
+
       if (response.data['success']) {
         final data = response.data['data']['result'];
         _hasMore = response.data['data']['hasMore'];
@@ -66,6 +74,24 @@ class VehicleController extends ChangeNotifier {
       return {"error": e.toString(),"status": 500};
     }
   }
+
+  
+  Future<Map<String,dynamic>> changeActiveVehicle(int id) async {
+    try {
+      Response response = await Vehicle.changeActiveVehicle(id);
+      if (response.data['success']) {
+        return {"error": false};
+
+      } else {
+        return {"error": response.data['message'],"status": response.statusCode};
+      }
+    } on DioException catch (e) {
+      return {"error": e.response!.data['message'],"status": e.response!.statusCode};
+    } catch (e) {
+      return {"error": e.toString(),"status": 500};
+    }
+  }
+
 
 
 

@@ -24,7 +24,9 @@ class Vehicle {
   String brand;
   String color;
   String? picture;
+  String? inactiveReason;
   bool currentActiveVehicle;
+
 
 
   Vehicle(
@@ -35,7 +37,9 @@ class Vehicle {
       required this.brand,
       required this.color,
       this.picture,
+      this.inactiveReason,
       this.currentActiveVehicle = false});
+
 
 
 
@@ -49,7 +53,9 @@ class Vehicle {
         model: map['model'],
         brand: map['brand'],
         color: map['color'],
+        inactiveReason: map['inactiveReason'],
         currentActiveVehicle: map['currentActiveVehicle']);
+
 
 
   }
@@ -97,5 +103,16 @@ class Vehicle {
     );
   }
 
+  static Future<Response> changeActiveVehicle(int id) async {
+    return await apiClient.dio.get(
+      '/api/vehicle/setActive/$id',
+      options: Options(
+        contentType: Headers.jsonContentType,
+        headers: {
+          'accept': 'application/json',
+        },
+      ),
+    );
 
+  }
 }

@@ -1,9 +1,11 @@
 import 'package:app_motoblack_mototaxista/controllers/vehicleController.dart';
 import 'package:app_motoblack_mototaxista/widgets/FloatingLoader.dart';
 import 'package:app_motoblack_mototaxista/widgets/addVehicle.dart';
+import 'package:app_motoblack_mototaxista/widgets/assets.dart';
 import 'package:app_motoblack_mototaxista/widgets/errorMessage.dart';
 import 'package:app_motoblack_mototaxista/widgets/vehicleCard.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 class VehiclesDetails extends StatefulWidget {
@@ -34,20 +36,68 @@ class _VehiclesDetailsState extends State<VehiclesDetails> {
 
   }
 
-  loadVehicles() async {
+  loadVehicles({bool reset=false}) async {
     _isLoading.value = true;
-    await controller.getVehicles();
+    await controller.getVehicles(reset);
     _isLoading.value = false;
+  }
+
+  void _changeVehicle(int? value) async {
+    _isLoading.value = true;
+    final ret = await controller.changeActiveVehicle(value!);
+    _isLoading.value = false;
+
+    if (ret['error'] == false) {
+        FToast().init(context).showToast(
+            child: MyToast(
+              msg: const Text(
+                'Veículo ativado com sucesso.',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+              icon: const Icon(
+                Icons.check,
+                color: Colors.white,
+              ),
+              color: Colors.greenAccent,
+            ),
+            gravity: ToastGravity.BOTTOM,
+            toastDuration: const Duration(seconds: 4));
+
+            loadVehicles(reset: true);
+      } else {
+        FToast().init(context).showToast(
+            child: MyToast(
+              msg: Text(
+                ret['status'] == 422
+                    ? ret['error']
+                    : 'Erro ao ativar veículo, tente novamente mais tarde.',
+                style: const TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+              icon: const Icon(
+                Icons.error,
+                color: Colors.white,
+              ),
+              color: Colors.redAccent,
+            ),
+            gravity: ToastGravity.BOTTOM,
+            toastDuration: const Duration(seconds: 5));
+      }
+
   }
 
   void _addVehicle() {
     showModalBottomSheet<void>(
         context: context,
         builder: (BuildContext context) {
-          return const AddVehicle();
+          return AddVehicle(onAdded: () => loadVehicles(reset: true));
         },
       );
   }
+
 
   Widget build(BuildContext context) {
 
@@ -70,20 +120,27 @@ class _VehiclesDetailsState extends State<VehiclesDetails> {
             const SizedBox(
               height: 12,
             ),
-            Align(
-              alignment: Alignment.topLeft,
-              child: ElevatedButton.icon(
-                    onPressed: _addVehicle,
-                    icon: const Icon(
-                      Icons.add,
-                      color: Colors.white,
-                    ),
-                    label: const Text(
-                            'Adicionar Veículo',
-                            style: TextStyle(
-                                fontSize: 18, color: Colors.white),
-                          )
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: _addVehicle,
+                  icon: const Icon(
+                    Icons.add,
+                    color: Colors.white,
                   ),
+                  label: const Text(
+                    'Adicionar Veículo',
+                    style: TextStyle(
+                      fontSize: 18, color: Colors.white
+                    ),
+                  )
+                ),
+                IconButton(
+                  onPressed: () => loadVehicles(reset: true),
+                  icon: const Icon(Icons.refresh),
+                ),
+              ],
             ),
             const SizedBox(
               height: 12,
@@ -91,8 +148,14 @@ class _VehiclesDetailsState extends State<VehiclesDetails> {
               Expanded(
                 child:  message ?? Stack(
                   children: [
-                    ...controller.vehicles.map((vehicle) => VehicleCard(vehicle: vehicle)).toList(),
+                     ListView.builder(
+                        controller: _scrollController,
+                        itemCount: controller.vehicles.length,
+                        itemBuilder: (ctx, index) =>
+                            VehicleCard(vehicle: controller.vehicles[index], onChanged: _changeVehicle)),
+                   
                     FloatingLoader(active: _isLoading)
+
                   ],
                 ),
               )
