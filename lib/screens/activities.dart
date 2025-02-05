@@ -1,9 +1,9 @@
 
 
 import 'package:app_motoblack_mototaxista/controllers/activityController.dart';
-import 'package:app_motoblack_mototaxista/widgets/FloatingLoader.dart';
-import 'package:app_motoblack_mototaxista/widgets/activityCard.dart';
-import 'package:app_motoblack_mototaxista/widgets/errorMessage.dart';
+import 'package:app_motoblack_mototaxista/widgets/assets/FloatingLoader.dart';
+import 'package:app_motoblack_mototaxista/widgets/activity/activityCard.dart';
+import 'package:app_motoblack_mototaxista/widgets/assets/errorMessage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

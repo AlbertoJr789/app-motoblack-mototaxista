@@ -4,13 +4,12 @@ import 'package:app_motoblack_mototaxista/controllers/apiClient.dart';
 import 'package:app_motoblack_mototaxista/models/Activity.dart';
 import 'package:app_motoblack_mototaxista/models/Agent.dart';
 import 'package:app_motoblack_mototaxista/models/Vehicle.dart';
-import 'package:app_motoblack_mototaxista/widgets/addVehicle.dart';
+import 'package:app_motoblack_mototaxista/widgets/profile/vehicle/addVehicle.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
 class VehicleController extends ChangeNotifier {
-
   int _page = 1;
   bool _hasMore = true;
   String error = '';
@@ -21,8 +20,7 @@ class VehicleController extends ChangeNotifier {
 
   getVehicles(bool reset) async {
     try {
-
-      if(reset){
+      if (reset) {
         _page = 1;
         _hasMore = true;
         vehicles = [];
@@ -51,7 +49,8 @@ class VehicleController extends ChangeNotifier {
 
   bool get hasMore => _hasMore;
 
-  Future<Map<String,dynamic>> addVehicle(String brand,String model,String plate,Color color,VehicleType type,File document) async {
+  Future<Map<String, dynamic>> addVehicle(String brand, String model,
+      String plate, Color color, VehicleType type, File document) async {
     try {
       FormData data = FormData.fromMap({
         'brand': brand,
@@ -66,34 +65,84 @@ class VehicleController extends ChangeNotifier {
       if (response.data['success']) {
         return {"error": false};
       } else {
-        return {"error": response.data['message'],"status": response.statusCode};
+        return {
+          "error": response.data['message'],
+          "status": response.statusCode
+        };
       }
     } on DioException catch (e) {
-      return {"error": e.response!.data['message'],"status": e.response!.statusCode};
+      return {
+        "error": e.response!.data['message'],
+        "status": e.response!.statusCode
+      };
     } catch (e) {
-      return {"error": e.toString(),"status": 500};
+      return {"error": e.toString(), "status": 500};
     }
   }
 
+  Future<Map<String, dynamic>> updateVehicle(int id, File document) async {
+    try {
+      FormData data = FormData.fromMap(
+          {'_method': 'PATCH', 'document': await MultipartFile.fromFile(document.path)});
   
-  Future<Map<String,dynamic>> changeActiveVehicle(int id) async {
+      Response response = await Vehicle.updateVehicle(id, data);
+      if (response.data['success']) {
+        return {"error": false};
+      } else {
+        return {
+          "error": response.data['message'],
+          "status": response.statusCode
+        };
+      }
+    } on DioException catch (e) {
+      return {
+        "error": e.response!.data['message'],
+        "status": e.response!.statusCode
+      };
+    } catch (e) {
+      return {"error": e.toString(), "status": 500};
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteVehicle(int id) async {
+    try {
+      Response response = await Vehicle.deleteVehicle(id);
+      if (response.data['success']) {
+        return {"error": false};
+      } else {
+        return {
+          "error": response.data['message'],
+          "status": response.statusCode
+        };
+      }
+    } on DioException catch (e) {
+      return {
+        "error": e.response!.data['message'],
+        "status": e.response!.statusCode
+      };
+    } catch (e) {
+      return {"error": e.toString(), "status": 500};
+    }
+  }
+
+  Future<Map<String, dynamic>> changeActiveVehicle(int id) async {
     try {
       Response response = await Vehicle.changeActiveVehicle(id);
       if (response.data['success']) {
         return {"error": false};
-
       } else {
-        return {"error": response.data['message'],"status": response.statusCode};
+        return {
+          "error": response.data['message'],
+          "status": response.statusCode
+        };
       }
     } on DioException catch (e) {
-      return {"error": e.response!.data['message'],"status": e.response!.statusCode};
+      return {
+        "error": e.response!.data['message'],
+        "status": e.response!.statusCode
+      };
     } catch (e) {
-      return {"error": e.toString(),"status": 500};
+      return {"error": e.toString(), "status": 500};
     }
   }
-
-
-
-
-
 }

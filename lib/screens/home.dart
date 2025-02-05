@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:app_motoblack_mototaxista/controllers/activityController.dart';
-import 'package:app_motoblack_mototaxista/widgets/toggleOnline.dart';
-import 'package:app_motoblack_mototaxista/widgets/trip.dart';
+import 'package:app_motoblack_mototaxista/widgets/trip/toggleOnline.dart';
+import 'package:app_motoblack_mototaxista/widgets/trip/trip.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';

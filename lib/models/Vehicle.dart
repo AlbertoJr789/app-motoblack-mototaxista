@@ -103,6 +103,31 @@ class Vehicle {
     );
   }
 
+  static Future<Response> updateVehicle(int id,FormData data) async {
+    return await apiClient.dio.post(
+      '/api/vehicle/$id',
+      options: Options(
+        contentType: Headers.multipartFormDataContentType,
+        headers: {
+          'accept': 'application/json',
+        },
+      ),
+      data: data,
+    );
+  }
+
+  static Future<Response> deleteVehicle(int id) async {
+    return await apiClient.dio.delete(
+      '/api/vehicle/$id',
+      options: Options(
+        contentType: Headers.jsonContentType,
+        headers: {
+          'accept': 'application/json',
+        },
+      ),
+    );
+  }
+
   static Future<Response> changeActiveVehicle(int id) async {
     return await apiClient.dio.get(
       '/api/vehicle/setActive/$id',

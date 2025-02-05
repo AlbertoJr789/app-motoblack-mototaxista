@@ -1,6 +1,6 @@
 
 import 'package:app_motoblack_mototaxista/controllers/apiClient.dart';
-import 'package:app_motoblack_mototaxista/widgets/assets.dart';
+import 'package:app_motoblack_mototaxista/widgets/assets/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluttertoast/fluttertoast.dart';

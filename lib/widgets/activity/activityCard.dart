@@ -1,6 +1,6 @@
 import 'package:app_motoblack_mototaxista/models/Activity.dart';
-import 'package:app_motoblack_mototaxista/screens/activityDetails.dart';
-import 'package:app_motoblack_mototaxista/widgets/textBadge.dart';
+import 'package:app_motoblack_mototaxista/widgets/activity/activityDetails.dart';
+import 'package:app_motoblack_mototaxista/widgets/assets/textBadge.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:app_motoblack_mototaxista/controllers/vehicleController.dart';
 import 'package:app_motoblack_mototaxista/models/Vehicle.dart';
-import 'package:app_motoblack_mototaxista/widgets/assets.dart';
+import 'package:app_motoblack_mototaxista/widgets/assets/toast.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -41,47 +41,15 @@ class _AddVehicleState extends State<AddVehicle> {
 
       Map<String, dynamic> ret = await _controller.addVehicle(_brand.text, _model.text, _plate.text, _color, _type, _document);
 
-      if (ret['error'] == false) {
-        FToast().init(context).showToast(
-            child: MyToast(
-              msg: const Text(
-                'Veículo adicionado com sucesso.',
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-
-              icon: const Icon(
-                Icons.check,
-                color: Colors.white,
-              ),
-              color: Colors.greenAccent,
-            ),
-            gravity: ToastGravity.BOTTOM,
-            toastDuration: const Duration(seconds: 4));
-
+     if (ret['error'] == false) {
+        toastSuccess(context, 'Veículo adicionado com sucesso.');
         widget.onAdded();
       } else {
-        FToast().init(context).showToast(
-            child: MyToast(
-              msg: Text(
-                ret['status'] == 422
+        toastError(context, ret['status'] == 422
                     ? ret['error']
-                    : 'Erro ao adicionar veículo, tente novamente mais tarde.',
-                style: const TextStyle(
-                  color: Colors.white,
-                ),
-
-              ),
-              icon: const Icon(
-                Icons.error,
-                color: Colors.white,
-              ),
-              color: Colors.redAccent,
-            ),
-            gravity: ToastGravity.BOTTOM,
-            toastDuration: const Duration(seconds: 5));
+                    : 'Erro ao adicionar veículo, tente novamente mais tarde.');
       }
+      
       setState(() {
         _isSaving = false;
       });

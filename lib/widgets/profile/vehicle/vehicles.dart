@@ -1,21 +1,26 @@
 import 'package:app_motoblack_mototaxista/controllers/vehicleController.dart';
-import 'package:app_motoblack_mototaxista/widgets/FloatingLoader.dart';
-import 'package:app_motoblack_mototaxista/widgets/addVehicle.dart';
-import 'package:app_motoblack_mototaxista/widgets/assets.dart';
-import 'package:app_motoblack_mototaxista/widgets/errorMessage.dart';
-import 'package:app_motoblack_mototaxista/widgets/vehicleCard.dart';
+import 'package:app_motoblack_mototaxista/models/Vehicle.dart';
+import 'package:app_motoblack_mototaxista/widgets/assets/FloatingLoader.dart';
+import 'package:app_motoblack_mototaxista/widgets/profile/vehicle/addVehicle.dart';
+import 'package:app_motoblack_mototaxista/widgets/assets/toast.dart';
+import 'package:app_motoblack_mototaxista/widgets/assets/errorMessage.dart';
+import 'package:app_motoblack_mototaxista/widgets/profile/vehicle/editVehicle.dart';
+import 'package:app_motoblack_mototaxista/widgets/profile/vehicle/vehicleCard.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
-class VehiclesDetails extends StatefulWidget {
-  const VehiclesDetails({super.key});
+class Vehicles extends StatefulWidget {
+  const Vehicles({super.key});
+
 
   @override
-  State<VehiclesDetails> createState() => _VehiclesDetailsState();
+  State<Vehicles> createState() => _VehiclesState();
+
 }
 
-class _VehiclesDetailsState extends State<VehiclesDetails> {
+class _VehiclesState extends State<Vehicles> {
+
 
   late VehicleController controller;
   final ScrollController _scrollController = ScrollController();
@@ -42,9 +47,19 @@ class _VehiclesDetailsState extends State<VehiclesDetails> {
     _isLoading.value = false;
   }
 
-  void _changeVehicle(int? value) async {
+  void _changeVehicle(Vehicle? value) async {
+
+    if(value?.inactiveReason != null){
+      _editVehicle(value!);
+      return;
+    }
+
+    if(value == null){
+      return;
+    }
+
     _isLoading.value = true;
-    final ret = await controller.changeActiveVehicle(value!);
+    final ret = await controller.changeActiveVehicle(value.id);
     _isLoading.value = false;
 
     if (ret['error'] == false) {
@@ -93,11 +108,32 @@ class _VehiclesDetailsState extends State<VehiclesDetails> {
     showModalBottomSheet<void>(
         context: context,
         builder: (BuildContext context) {
-          return AddVehicle(onAdded: () => loadVehicles(reset: true));
+          return AddVehicle(onAdded: () {
+            Navigator.of(context).pop();
+            loadVehicles(reset: true);
+          });
         },
       );
   }
 
+
+  void _editVehicle(Vehicle vehicle) {
+    showModalBottomSheet<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return EditVehicle(onUpdated: () {
+            Navigator.of(context).pop();
+            loadVehicles(reset: true);
+          },vehicle: vehicle);
+        },
+      );
+
+  }
+
+  void _deleteVehicle(Vehicle vehicle) {
+    controller.vehicles.remove(vehicle);
+    setState(() {});
+  }
 
   Widget build(BuildContext context) {
 
@@ -152,7 +188,7 @@ class _VehiclesDetailsState extends State<VehiclesDetails> {
                         controller: _scrollController,
                         itemCount: controller.vehicles.length,
                         itemBuilder: (ctx, index) =>
-                            VehicleCard(vehicle: controller.vehicles[index], onChanged: _changeVehicle)),
+                            VehicleCard(vehicle: controller.vehicles[index], onChanged: _changeVehicle, onDelete: _deleteVehicle)),
                    
                     FloatingLoader(active: _isLoading)
 

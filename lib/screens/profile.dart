@@ -2,8 +2,8 @@
 // import 'package:app_motoblack_cliente/widgets/paymentDetails.dart';
 import 'package:app_motoblack_mototaxista/controllers/loginController.dart';
 import 'package:app_motoblack_mototaxista/controllers/vehicleController.dart';
-import 'package:app_motoblack_mototaxista/widgets/profileDetails.dart';
-import 'package:app_motoblack_mototaxista/widgets/vehiclesDetails.dart';
+import 'package:app_motoblack_mototaxista/widgets/profile/profileDetails.dart';
+import 'package:app_motoblack_mototaxista/widgets/profile/vehicle/vehicles.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -63,7 +63,7 @@ class _ProfileState extends State<Profile> {
         ),
         body: TabBarView(children: [
           const ProfileDetails(),
-          ChangeNotifierProvider(create: (context) => VehicleController(), child: const VehiclesDetails()),
+          ChangeNotifierProvider(create: (context) => VehicleController(), child: const Vehicles()),
           //  PaymentDetails(),
           //  HelpDetails()
         ]),
