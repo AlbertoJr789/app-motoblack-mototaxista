@@ -63,43 +63,10 @@ class _VehiclesState extends State<Vehicles> {
     _isLoading.value = false;
 
     if (ret['error'] == false) {
-        FToast().init(context).showToast(
-            child: MyToast(
-              msg: const Text(
-                'Veículo ativado com sucesso.',
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-              icon: const Icon(
-                Icons.check,
-                color: Colors.white,
-              ),
-              color: Colors.greenAccent,
-            ),
-            gravity: ToastGravity.BOTTOM,
-            toastDuration: const Duration(seconds: 4));
-
-            loadVehicles(reset: true);
+        toastSuccess(context, 'Veículo ativado com sucesso.');
+        loadVehicles(reset: true);
       } else {
-        FToast().init(context).showToast(
-            child: MyToast(
-              msg: Text(
-                ret['status'] == 422
-                    ? ret['error']
-                    : 'Erro ao ativar veículo, tente novamente mais tarde.',
-                style: const TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-              icon: const Icon(
-                Icons.error,
-                color: Colors.white,
-              ),
-              color: Colors.redAccent,
-            ),
-            gravity: ToastGravity.BOTTOM,
-            toastDuration: const Duration(seconds: 5));
+        toastError(context, ret['status'] == 422 ? ret['error'] : 'Erro ao ativar veículo, tente novamente mais tarde.');
       }
 
   }
