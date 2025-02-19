@@ -24,6 +24,8 @@ class _ActivityDetailsState extends State<ActivityDetails> {
 
   final List<Polyline> _polylines = [];
 
+  final DraggableScrollableController _scrollController = DraggableScrollableController();
+
   _initMarkers() async {
 
     _markers.add(Marker(
@@ -69,7 +71,7 @@ class _ActivityDetailsState extends State<ActivityDetails> {
 
     String destinyTime =
         DateFormat('dd/MM/y HH:mm').format(widget.activity.finishedAt!);
-    String addrDestiny = '${widget.activity.origin.street} ${widget.activity.origin.number}';
+    String addrDestiny = '${widget.activity.destiny.street} ${widget.activity.destiny.number}';
 
     final dynamic showEval, showObs;
 
@@ -93,11 +95,11 @@ class _ActivityDetailsState extends State<ActivityDetails> {
         title: const Text('Detalhes da Atividade'),
       ),
       backgroundColor: const Color.fromARGB(255, 245, 245, 245),
-      body: Column(
+      body: Stack(
+        fit: StackFit.expand,
         children: [
           SizedBox(
             width: double.infinity,
-            height: MediaQuery.of(context).size.height * 0.3,
             child: GoogleMap(
               initialCameraPosition: CameraPosition(
                 target: LatLng(widget.activity.origin.latitude!, widget.activity.origin.longitude!),
@@ -105,115 +107,149 @@ class _ActivityDetailsState extends State<ActivityDetails> {
                 ),
                 markers: Set<Marker>.of(_markers),
                 polylines: Set<Polyline>.of(_polylines),
-            ),
+            ), 
           ),
-          SingleChildScrollView(
-            child: SizedBox(
-              width: double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+          DraggableScrollableSheet(
+            controller: _scrollController,
+            initialChildSize: 0.4,
+            minChildSize: 0.3,
+            maxChildSize: 0.7,
+            builder: (context, scrollController) => Container(
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(20)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                    ),
+                  ],
+                ),
+              child: SingleChildScrollView(
+                controller: scrollController,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(
-                            Icons.not_started,
-                            color: Colors.black,
-                            size: 40,
+                           Center(
+                             child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Colors.black,
+                                  ),
+                                  width: 50,
+                                  height: 10,
+                                ),
+                              ),
+                           ),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.flag,
+                                color: Theme.of(context).colorScheme.secondary,
+                                size: 40,
+                              ),
+                              Flexible(
+                                fit: FlexFit.loose,
+                                child: Text(
+                                  addrOrigin,
+                                  textAlign: TextAlign.start,
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Icon(
+                                Icons.timer_sharp,
+                                color: Theme.of(context).colorScheme.secondary,
+                                size: 40,
+                              ),
+                              Text(
+                                originTime,
+                                textAlign: TextAlign.start,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ],
                           ),
-                          Flexible(
-                            fit: FlexFit.loose,
-                            child: Text(
-                              addrOrigin,
-                              textAlign: TextAlign.start,
-                              style: const TextStyle(fontSize: 14),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 18.0),
+                            child: SizedBox(
+                              height: 30,
+                              width: 3,
+                              child: Container(
+                                color: Colors.black,
+                              ),
                             ),
                           ),
-                          const SizedBox(
-                            width: 10,
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.flag_circle,
+                                color: Theme.of(context).colorScheme.surface,
+                                size: 40,
+                              ),
+                              Flexible(
+                                fit: FlexFit.loose,
+                                child: Text(
+                                  addrDestiny,
+                                  textAlign: TextAlign.start,
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Icon(
+                                Icons.timer_sharp,
+                                color: Theme.of(context).colorScheme.surface,
+                                size: 40,
+                              ),
+                              Text(
+                                destinyTime,
+                                textAlign: TextAlign.start,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ],
                           ),
-                          const Icon(
-                            Icons.timer_sharp,
-                            color: Colors.black,
-                            size: 40,
-                          ),
-                          Text(
-                            originTime,
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 18.0),
-                        child: SizedBox(
-                          height: 30,
-                          width: 3,
-                          child: Container(
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.flag_circle,
-                            color: Colors.black,
-                            size: 40,
-                          ),
-                          Flexible(
-                            fit: FlexFit.loose,
-                            child: Text(
-                              addrDestiny,
-                              textAlign: TextAlign.start,
-                              style: const TextStyle(fontSize: 14),
-                            ),
+                          const Divider(
+                            color: Color.fromARGB(232, 221, 214, 214),
+                            thickness: 0.5,
                           ),
                           const SizedBox(
-                            width: 10,
+                            height: 10,
                           ),
-                          const Icon(
-                            Icons.timer_sharp,
-                            color: Colors.black,
-                            size: 40,
+                          _passengerDetails(widget.activity.passenger!, widget.activity.vehicle!),
+                          const SizedBox(
+                            height: 10,
                           ),
-                          Text(
-                            destinyTime,
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(fontSize: 14),
+                          const Divider(
+                            color: Color.fromARGB(232, 221, 214, 214),
+                            thickness: 0.5,
                           ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          showEval,
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const Divider(
+                            color: Color.fromARGB(232, 221, 214, 214),
+                            thickness: 0.5,
+                          ),
+                          showObs
                         ],
                       ),
-                      const Divider(
-                        color: Color.fromARGB(232, 221, 214, 214),
-                        thickness: 0.5,
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      _passengerDetails(widget.activity.passenger!, widget.activity.vehicle!),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Divider(
-                        color: Color.fromARGB(232, 221, 214, 214),
-                        thickness: 0.5,
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      showEval,
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Divider(
-                        color: Color.fromARGB(232, 221, 214, 214),
-                        thickness: 0.5,
-                      ),
-                      showObs
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -259,61 +295,62 @@ class _ActivityDetailsState extends State<ActivityDetails> {
       '0xFF${vehicle.color.toString().replaceFirst('#', '')}',
     );
 
-    return IntrinsicHeight(
-      child: Row(
-        children: [
-          Column(
+    return Row(
+      children: [
+        SizedBox(width: 10,),
+        Column(
+          children: [
+            const Text('Passageiro'),
+            const SizedBox(
+              height: 10,
+            ),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(25.0),
+              child: CachedNetworkImage(
+                  fit: BoxFit.cover,
+                  width: 50,
+                  height: 50,
+                  placeholder: (context, url) =>
+                      const CircularProgressIndicator(),
+                  errorWidget: (context, url, error) =>
+                      const Icon(Icons.person_off_outlined,color: Colors.black,),
+                  imageUrl: passenger.avatar!),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Text('${passenger.name}'),
+          ],
+        ),
+        const SizedBox(width: 10,),
+        Container(
+          height: 100,
+          child: const VerticalDivider(
+            color: Colors.grey,
+            thickness: 1,
+            width: 20,
+          ),
+        ),
+        Expanded(
+          child: Column(
             children: [
-              const Text('Passageiro'),
+              const Text('Veículo que você utilizou'),
               const SizedBox(
                 height: 10,
               ),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(25.0),
-                child: CachedNetworkImage(
-                    fit: BoxFit.cover,
-                    width: 50,
-                    height: 50,
-                    placeholder: (context, url) =>
-                        const CircularProgressIndicator(),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.person_off_outlined,color: Colors.black,),
-                    imageUrl: passenger.avatar!),
+              Icon(
+                vehicle.type == VehicleType.car ? Icons.directions_car : Icons.motorcycle,
+                color: Color(vehicleColor),
+                size: 50,
               ),
+              const SizedBox(
+                height: 10,
+              ),
+              Text('${vehicle.model} - Placa ${vehicle.plate}'),
             ],
           ),
-          SizedBox(
-            height: double.infinity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Row(
-                  children: [
-                    Column(
-                      children: [
-                        Text('${passenger.name}'),
-                        Row(
-                          children: [
-                            Text('Veículo que você utilizou'),
-                            Text('Placa: ${vehicle.plate}, Cor: '),
-                            SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: Container(
-                                color: Color(vehicleColor),
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    )
-                  ],
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
