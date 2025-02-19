@@ -3,39 +3,87 @@ import 'package:app_motoblack_mototaxista/models/Activity.dart';
 import 'package:app_motoblack_mototaxista/models/Passenger.dart';
 import 'package:app_motoblack_mototaxista/models/Vehicle.dart';
 import 'package:app_motoblack_mototaxista/widgets/assets/infoBanner.dart';
+import 'package:app_motoblack_mototaxista/widgets/trip/tripIcon.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 
-class ActivityDetails extends StatelessWidget {
+class ActivityDetails extends StatefulWidget {
   final Activity activity;
 
   const ActivityDetails({super.key, required this.activity});
 
   @override
+  State<ActivityDetails> createState() => _ActivityDetailsState();
+}
+
+class _ActivityDetailsState extends State<ActivityDetails> {
+  final List<Marker> _markers = [];
+
+  final List<Polyline> _polylines = [];
+
+  _initMarkers() async {
+
+    _markers.add(Marker(
+      markerId: MarkerId('origin'),
+      position: LatLng(widget.activity.origin.latitude!, widget.activity.origin.longitude!),
+      infoWindow: InfoWindow(title: 'Origem'),
+      icon: await createFlagBitmapFromIcon(Icon(Icons.flag,color: Theme.of(context).colorScheme.secondary,)),
+    ));
+
+    _markers.add(Marker(
+      markerId: MarkerId('destiny'),
+      position: LatLng(widget.activity.destiny.latitude!, widget.activity.destiny.longitude!),
+      infoWindow: InfoWindow(title: 'Destino'),
+      icon: await createFlagBitmapFromIcon(Icon(Icons.flag_circle,color: Theme.of(context).colorScheme.surface,)),
+    ));
+
+    _polylines.add(Polyline(
+      polylineId: PolylineId('route'),
+      points: [
+        LatLng(widget.activity.origin.latitude!, widget.activity.origin.longitude!),
+        LatLng(widget.activity.destiny.latitude!, widget.activity.destiny.longitude!),
+      ],
+      color: Theme.of(context).colorScheme.secondary,
+      width: 5,
+    ));
+
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initMarkers();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    String originTime = DateFormat('dd/MM/y HH:mm').format(activity.createdAt!);
-    String addrOrigin = '${activity.origin.street} ${activity.origin.number}';
+    String originTime = DateFormat('dd/MM/y HH:mm').format(widget.activity.createdAt!);
+    String addrOrigin = '${widget.activity.origin.street} ${widget.activity.origin.number}';
 
     String destinyTime =
-        DateFormat('dd/MM/y HH:mm').format(activity.finishedAt!);
-    String addrDestiny = '${activity.origin.street} ${activity.origin.number}';
+        DateFormat('dd/MM/y HH:mm').format(widget.activity.finishedAt!);
+    String addrDestiny = '${widget.activity.origin.street} ${widget.activity.origin.number}';
 
     final dynamic showEval, showObs;
 
-    if (activity.canceled!) {
+    if (widget.activity.canceled!) {
       showEval =
           InfoBanner(type: 'danger', msg: 'Esta atividade foi cancelada!');
       showObs = Text(
-        'Justificativa de cancelamento: ${activity.cancellingReason ?? '-'}',
+        'Justificativa de cancelamento: ${widget.activity.cancellingReason ?? '-'}',
         style: const TextStyle(fontSize: 18),
       );
     } else {
-      showEval = _evaluation(activity);
+      showEval = _evaluation(widget.activity);
       showObs = Text(
-        'Observações relatadas: ${activity.obs ?? '-'}',
+        'Observações relatadas: ${widget.activity.obs ?? '-'}',
         style: const TextStyle(fontSize: 18),
       );
     }
@@ -50,11 +98,13 @@ class ActivityDetails extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             height: MediaQuery.of(context).size.height * 0.3,
-            child: const GoogleMap(
+            child: GoogleMap(
               initialCameraPosition: CameraPosition(
-                target: LatLng(-20.461858529051117, -45.43592934890276),
+                target: LatLng(widget.activity.origin.latitude!, widget.activity.origin.longitude!),
                 zoom: 12,
-              ),
+                ),
+                markers: Set<Marker>.of(_markers),
+                polylines: Set<Polyline>.of(_polylines),
             ),
           ),
           SingleChildScrollView(
@@ -143,7 +193,7 @@ class ActivityDetails extends StatelessWidget {
                       const SizedBox(
                         height: 10,
                       ),
-                      _passengerDetails(activity.passenger!, activity.vehicle!),
+                      _passengerDetails(widget.activity.passenger!, widget.activity.vehicle!),
                       const SizedBox(
                         height: 10,
                       ),
