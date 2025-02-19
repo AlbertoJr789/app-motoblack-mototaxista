@@ -17,6 +17,7 @@ var kTheme = ThemeData.dark().copyWith(
   ),
   colorScheme: ColorScheme.fromSeed(
     seedColor: _sencondaryColor,
+    secondary: _sencondaryColor,
     inversePrimary: _inversePrimary,
     brightness: Brightness.dark,
     surface: _primaryColor,

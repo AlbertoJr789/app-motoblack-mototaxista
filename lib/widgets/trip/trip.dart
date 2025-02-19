@@ -24,7 +24,9 @@ class _TripState extends State<Trip> {
   late ActivityController _controller;
   late StreamSubscription _stream;
   final List<Marker> _markers = [];
+  List<Polyline> _polylines = [];
   BitmapDescriptor? _passengerIcon;
+  bool _showMap = true;
 
   @override
   initState() {
@@ -38,6 +40,32 @@ class _TripState extends State<Trip> {
     try {
       final String url = '${ApiClient.instance.baseUrl}/api/marker/${_controller.currentActivity!.passenger!.userId}';
       _passengerIcon = await getMarkerImageFromUrl(url,targetWidth: 120);
+
+      _markers.add(Marker(
+        markerId: const MarkerId('origin'),
+        position: LatLng(_controller.currentActivity!.origin.latitude!,
+            _controller.currentActivity!.origin.longitude!),
+        icon: await createFlagBitmapFromIcon(Icon(Icons.flag,color: Theme.of(context).colorScheme.secondary)),
+        infoWindow: const InfoWindow(title: 'Ponto de partida'),
+        ));
+    
+      _markers.add(Marker(
+        markerId: const MarkerId('destiny'),
+        position: LatLng(_controller.currentActivity!.destiny.latitude!,
+            _controller.currentActivity!.destiny.longitude!),
+        icon: await createFlagBitmapFromIcon(Icon(Icons.flag_circle_rounded,color: Theme.of(context).colorScheme.surface,)),
+        infoWindow: const InfoWindow(title: 'Ponto de destino'),
+        ));
+
+      _polylines.add(Polyline(
+        width: 4,
+        polylineId: const PolylineId('origin-destiny'),
+        points: [LatLng(_controller.currentActivity!.origin.latitude!,
+            _controller.currentActivity!.origin.longitude!),
+        LatLng(_controller.currentActivity!.destiny.latitude!,
+            _controller.currentActivity!.destiny.longitude!)],
+        color: Theme.of(context).colorScheme.secondary));
+
       setState(() {});
     } catch (e) {
       _passengerIcon = BitmapDescriptor.defaultMarker;
@@ -45,7 +73,7 @@ class _TripState extends State<Trip> {
     }
   }
 
-  _listenTrip() {
+  _listenTrip() async {
     _stream = FirebaseDatabase.instance
         .ref('trips')
         .child(_controller.currentActivity!.uuid!)
@@ -81,7 +109,7 @@ class _TripState extends State<Trip> {
           return;
         }
         
-        _markers.clear();
+        _markers.removeWhere((marker) => marker.markerId.value == 'passenger');
         _markers.add(Marker(
           markerId: const MarkerId('passenger'),
           position: LatLng(
@@ -100,36 +128,97 @@ class _TripState extends State<Trip> {
   @override
   Widget build(BuildContext context) {
     return Stack(
+      fit: StackFit.expand,
       children: [
-        GoogleMap(
-          myLocationEnabled: true,
-          myLocationButtonEnabled: true,
-          initialCameraPosition: CameraPosition(
-              target: LatLng(_controller.currentActivity!.origin.latitude!,
-                  _controller.currentActivity!.origin.longitude!),
-              zoom: 16),
-          markers: Set<Marker>.of(_markers),
-        ),
-        Align(
-          alignment: Alignment.topCenter,
-          child: Center(
-            child: ElevatedButton.icon(
-              onPressed: _endTripDialog,
-              icon: const Icon(
-                Icons.close,
+        if (_showMap)
+          GoogleMap(
+            zoomControlsEnabled: false,
+            myLocationEnabled: true,
+            myLocationButtonEnabled: true,
+            polylines: Set<Polyline>.of(_polylines),
+            initialCameraPosition: CameraPosition(
+                target: LatLng(_controller.currentActivity!.origin.latitude!,
+                    _controller.currentActivity!.origin.longitude!),
+                zoom: 16),
+            markers: Set<Marker>.of(_markers),
+          ),
+        Positioned(
+          bottom: 10.0,
+          right: 10.0,
+          child: Tooltip(
+            message: 'Esconder/Exibir Mapa',
+            child: FloatingActionButton(
+              onPressed: () {
+                setState(() {
+                  _showMap = !_showMap;
+                });
+              },
+              child: Icon(
+                _showMap ? Icons.map : Icons.map_outlined,
                 color: Colors.white,
               ),
-              label: const Text(
-                "Cancelar",
-                style: TextStyle(color: Colors.white),
-              ),
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(
-                    Colors.red), // Set the background color of the icon
-              ),
+              backgroundColor: Colors.blue,
             ),
           ),
         ),
+        if (_showMap)
+          Positioned(
+            top: 20.0,
+            left: 0.0,
+            right: 0.0,
+            child: Center(
+              child: ElevatedButton.icon(
+                onPressed: _endTripDialog,
+                icon: const Icon(
+                  Icons.close,
+                  color: Colors.white,
+                ),
+                label: const Text(
+                  "Cancelar",
+                  style: TextStyle(color: Colors.white),
+                ),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                      Colors.red), // Set the background color of the icon
+                ),
+              ),
+            ),
+          )
+        else
+          Positioned(
+            top: 20.0,
+            left: 0.0,
+            right: 0.0,
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              color: Theme.of(context).colorScheme.surface,
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                   Text(
+                    "Corrida em andamento. Ative o mapa para ver o passageiro.",
+                    style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                    textAlign: TextAlign.center,
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: _endTripDialog,
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                    ),
+                    label: const Text(
+                      "Cancelar",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          Colors.red), // Set the background color of the icon
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
       ],
     );
   }
