@@ -16,8 +16,13 @@ class ActivityController extends ChangeNotifier {
   Position? currentLocation;
   static final ApiClient apiClient = ApiClient.instance;
 
-    getActivities() async {
+    getActivities(reset) async {
     try {
+      if(reset){
+        _page = 1;
+        _hasMore = true;
+        activities = [];
+      }
       Response response = await Activity.getActivities(_page);
       if (response.data['success']) {
         final data = response.data['data']['result'];
