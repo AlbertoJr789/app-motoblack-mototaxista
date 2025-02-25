@@ -28,7 +28,8 @@ class Activity {
   Address origin;
   Address destiny;
   double? price;
-  int? evaluation;
+  double? evaluationAgent;
+  double? evaluationPassenger;
   String? obs;
   String? route;
   bool? canceled;
@@ -47,7 +48,8 @@ class Activity {
       required this.origin,
       required this.destiny,
        this.price,
-       this.evaluation,
+       this.evaluationAgent,
+       this.evaluationPassenger,
       this.obs,
        this.canceled,
        this.route,
@@ -65,10 +67,11 @@ class Activity {
         origin: Address.fromJson(map['origin']),
         destiny: Address.fromJson(map['destiny']),
         price: map['price'] != null ? double.parse(map['price'].toString()) : null,
-        evaluation: map['passengerEvaluation'],
+        evaluationAgent: map['agentEvaluation'] != null ? double.parse(map['agentEvaluation'].toString()) : null,
+        evaluationPassenger: map['passengerEvaluation'] != null ? double.parse(map['passengerEvaluation'].toString()) : null,
         route: map['route'],
         canceled: map['cancelled'] == 1 ? true : false,
-        obs: map['passengerObs'],
+        obs: map['agentObs'],
         cancellingReason: map['cancellingReason'],
         createdAt: DateTime.parse(map['createdAt']),
         finishedAt: map['finishedAt'] != null ? DateTime.parse(map['finishedAt']) : null

@@ -132,123 +132,121 @@ class _ActivityDetailsState extends State<ActivityDetails> {
                   width: double.infinity,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                           Center(
-                             child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.black,
-                                  ),
-                                  width: 50,
-                                  height: 10,
-                                ),
-                              ),
-                           ),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.flag,
-                                color: Theme.of(context).colorScheme.secondary,
-                                size: 40,
-                              ),
-                              Flexible(
-                                fit: FlexFit.loose,
-                                child: Text(
-                                  addrOrigin,
-                                  textAlign: TextAlign.start,
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Icon(
-                                Icons.timer_sharp,
-                                color: Theme.of(context).colorScheme.secondary,
-                                size: 40,
-                              ),
-                              Text(
-                                originTime,
-                                textAlign: TextAlign.start,
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 18.0),
-                            child: SizedBox(
-                              height: 30,
-                              width: 3,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                         Center(
+                           child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8),
                               child: Container(
-                                color: Colors.black,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.black,
+                                ),
+                                width: 50,
+                                height: 10,
                               ),
                             ),
-                          ),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.flag_circle,
-                                color: Theme.of(context).colorScheme.surface,
-                                size: 40,
-                              ),
-                              Flexible(
-                                fit: FlexFit.loose,
-                                child: Text(
-                                  addrDestiny,
-                                  textAlign: TextAlign.start,
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Icon(
-                                Icons.timer_sharp,
-                                color: Theme.of(context).colorScheme.surface,
-                                size: 40,
-                              ),
-                              Text(
-                                destinyTime,
+                         ),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.flag,
+                              color: Theme.of(context).colorScheme.secondary,
+                              size: 40,
+                            ),
+                            Flexible(
+                              fit: FlexFit.loose,
+                              child: Text(
+                                addrOrigin,
                                 textAlign: TextAlign.start,
                                 style: const TextStyle(fontSize: 14),
                               ),
-                            ],
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Icon(
+                              Icons.timer_sharp,
+                              color: Theme.of(context).colorScheme.secondary,
+                              size: 40,
+                            ),
+                            Text(
+                              originTime,
+                              textAlign: TextAlign.start,
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 18.0),
+                          child: SizedBox(
+                            height: 30,
+                            width: 3,
+                            child: Container(
+                              color: Colors.black,
+                            ),
                           ),
-                          const Divider(
-                            color: Color.fromARGB(232, 221, 214, 214),
-                            thickness: 0.5,
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          _passengerDetails(widget.activity.passenger!, widget.activity.vehicle!),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          const Divider(
-                            color: Color.fromARGB(232, 221, 214, 214),
-                            thickness: 0.5,
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          showEval,
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          const Divider(
-                            color: Color.fromARGB(232, 221, 214, 214),
-                            thickness: 0.5,
-                          ),
-                          showObs
-                        ],
-                      ),
+                        ),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.flag_circle,
+                              color: Theme.of(context).colorScheme.surface,
+                              size: 40,
+                            ),
+                            Flexible(
+                              fit: FlexFit.loose,
+                              child: Text(
+                                addrDestiny,
+                                textAlign: TextAlign.start,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Icon(
+                              Icons.timer_sharp,
+                              color: Theme.of(context).colorScheme.surface,
+                              size: 40,
+                            ),
+                            Text(
+                              destinyTime,
+                              textAlign: TextAlign.start,
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                          ],
+                        ),
+                        const Divider(
+                          color: Color.fromARGB(232, 221, 214, 214),
+                          thickness: 0.5,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        _passengerDetails(widget.activity.passenger!, widget.activity.vehicle!),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Divider(
+                          color: Color.fromARGB(232, 221, 214, 214),
+                          thickness: 0.5,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        showEval,
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Divider(
+                          color: Color.fromARGB(232, 221, 214, 214),
+                          thickness: 0.5,
+                        ),
+                        showObs
+                      ],
                     ),
                   ),
                 ),
@@ -261,31 +259,68 @@ class _ActivityDetailsState extends State<ActivityDetails> {
   }
 
   Widget _evaluation(activity) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Column(
       children: [
-        const Flexible(
-          child: Text(
-            'Sua avaliação',
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+        
+            const Flexible(
+              child: Text(
+                'Avaliação que você deu ao passageiro',
+              ),
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            RatingBar(
+              ignoreGestures: true,
+              initialRating: activity.evaluationAgent,
+              itemCount: 5,
+              allowHalfRating: true,
+              ratingWidget: RatingWidget(
+                  full: const Icon(Icons.star, color: Colors.amber),
+                  half: const Icon(Icons.star_half, color: Colors.amber),
+                  empty: const Icon(
+                    Icons.star_outline_outlined,
+                    color: Color.fromARGB(255, 209, 203, 203),
+                  )),
+              onRatingUpdate: (rate) {},
+            ),
+          ],
+        ),
+        const SizedBox(height: 10,),
+      if(activity.evaluationPassenger != null)
+        Row(children: [
+          const Flexible(
+            child: Text(
+              'Avaliação que você recebeu do passageiro',
+            ),
           ),
-        ),
-        const SizedBox(
-          width: 10,
-        ),
-        RatingBar(
-          ignoreGestures: true,
-          initialRating: double.parse(activity.evaluation.toString()),
-          itemCount: 5,
-          ratingWidget: RatingWidget(
-              full: const Icon(Icons.star, color: Colors.amber),
-              half: const Icon(Icons.star_half, color: Colors.amber),
-              empty: const Icon(
-                Icons.star_outline_outlined,
-                color: Color.fromARGB(255, 209, 203, 203),
-              )),
-          onRatingUpdate: (rate) {},
-        )
-        // EvaluationStar(activity.evaluation),
+          const SizedBox(
+            width: 10,
+          ),
+          RatingBar(
+            ignoreGestures: true,
+            initialRating: activity.evaluationPassenger,
+            itemCount: 5,
+            allowHalfRating: true,
+            ratingWidget: RatingWidget(
+                full: const Icon(Icons.star, color: Colors.amber),
+                half: const Icon(Icons.star_half, color: Colors.amber),
+                empty: const Icon(
+                  Icons.star_outline_outlined,
+                  color: Color.fromARGB(255, 209, 203, 203),
+                )),
+            onRatingUpdate: (rate) {},
+          ),
+        ],),
+        if(activity.evaluationPassenger == null)
+          Center(
+            child: Text(
+              'Você ainda não foi avaliado',
+            ),
+          ),
       ],
     );
   }
@@ -331,24 +366,22 @@ class _ActivityDetailsState extends State<ActivityDetails> {
             width: 20,
           ),
         ),
-        Expanded(
-          child: Column(
-            children: [
-              const Text('Veículo que você utilizou'),
-              const SizedBox(
-                height: 10,
-              ),
-              Icon(
-                vehicle.type == VehicleType.car ? Icons.directions_car : Icons.motorcycle,
-                color: Color(vehicleColor),
-                size: 50,
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Text('${vehicle.model} - Placa ${vehicle.plate}'),
-            ],
-          ),
+        Column(
+          children: [
+            const Text('Veículo que você utilizou'),
+            const SizedBox(
+              height: 10,
+            ),
+            Icon(
+              vehicle.type == VehicleType.car ? Icons.directions_car : Icons.motorcycle,
+              color: Color(vehicleColor),
+              size: 50,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Text('${vehicle.model} - Placa ${vehicle.plate}'),
+          ],
         ),
       ],
     );

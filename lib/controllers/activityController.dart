@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:app_motoblack_mototaxista/controllers/apiClient.dart';
 import 'package:app_motoblack_mototaxista/models/Activity.dart';
 import 'package:app_motoblack_mototaxista/models/Agent.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ActivityController extends ChangeNotifier {
 
@@ -132,5 +135,48 @@ class ActivityController extends ChangeNotifier {
       return false;
     }
   }
+
+   Future<bool> finishActivity({Activity? trip,double? evaluation,String? evaluationComment}) async {
+    try {
+      Response response = await apiClient.dio.patch(
+        '/api/activity/${trip!.id}',
+        options: Options(
+          headers: {
+            'accept': 'application/json',
+          },
+        ),
+        data: {'nota_passageiro': evaluation,'obs_agente': evaluationComment}
+      );
+      removeCurrentActivity();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+   //activity disk persistance, in case user closes the app
+  storeCurrentActivity(Map<String,dynamic> data) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('currentActivity',jsonEncode(data));
+    currentActivity = Activity.fromJson(data);
+    notifyListeners();
+  }
+
+  getCurrentActivity() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? activity = prefs.getString('currentActivity');
+    currentActivity = activity != null ? Activity.fromJson(jsonDecode(activity)) : null;
+    if(currentActivity != null){
+      notifyListeners();
+    }
+  }
+
+  removeCurrentActivity() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('currentActivity');
+    currentActivity = null;
+    notifyListeners();
+  }
+
 
 }

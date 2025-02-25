@@ -9,7 +9,9 @@ import 'package:app_motoblack_mototaxista/widgets/trip/tripIcon.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -23,24 +25,150 @@ class Trip extends StatefulWidget {
 class _TripState extends State<Trip> {
   late ActivityController _controller;
   late StreamSubscription _stream;
+  
   final List<Marker> _markers = [];
   List<Polyline> _polylines = [];
+
   BitmapDescriptor? _passengerIcon;
   bool _showMap = true;
+  bool _allowConclusion = false;
+  double _acceptableRadius = 30;
+
 
   @override
   initState() {
     super.initState();
     _controller = Provider.of<ActivityController>(context, listen: false);
-    _createMarkerIcon();
     _listenTrip();
   }
 
+  @override
+  Widget build(BuildContext context) {
+    if(_passengerIcon == null){
+      _createMarkerIcon();
+    }
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        if (_showMap)
+          GoogleMap(
+            zoomControlsEnabled: false,
+            myLocationEnabled: true,
+            myLocationButtonEnabled: true,
+            polylines: Set<Polyline>.of(_polylines),
+            initialCameraPosition: CameraPosition(
+                target: LatLng(_controller.currentActivity!.origin.latitude!,
+                    _controller.currentActivity!.origin.longitude!),
+                zoom: 16),
+            markers: Set<Marker>.of(_markers),
+                circles: {
+                  Circle(
+                    circleId: const CircleId('destination-area'),
+                    onTap: (){
+                      print('TOAST');
+                      toastInfo(context, 'Deixe o passageiro neste raio para conseguir concluir a corrida, entenderemos que chegou próximo ao seu destino');
+                    },
+                    center: LatLng(
+                        _controller.currentActivity!.destiny.latitude!,
+                        _controller.currentActivity!.destiny.longitude!),
+                    radius: _acceptableRadius,
+                    strokeWidth: 2,
+                    strokeColor:
+                        _allowConclusion ? Colors.green : Colors.red,
+                    fillColor: _allowConclusion
+                        ? Colors.greenAccent.withOpacity(0.2)
+                        : Colors.redAccent.withOpacity(0.2),
+
+                  ),
+                },
+          ),
+        Positioned(
+          bottom: 10.0,
+          right: 10.0,
+          child: Tooltip(
+            message: 'Esconder/Exibir Mapa',
+            child: FloatingActionButton(
+              onPressed: () {
+                setState(() {
+                  _showMap = !_showMap;
+                });
+              },
+              child: Icon(
+                _showMap ? Icons.map : Icons.map_outlined,
+                color: Colors.white,
+              ),
+              backgroundColor: Colors.blue,
+            ),
+          ),
+        ),
+        if (_showMap)
+          Positioned(
+            top: 20.0,
+            left: 0.0,
+            right: 0.0,
+            child: Center(
+              child: ElevatedButton.icon(
+                onPressed: _endTripDialog,
+                icon: Icon(
+                  _allowConclusion ? Icons.check : Icons.close,
+                  color: Colors.white,
+                ),
+                label: Text(
+                  _allowConclusion ? "Concluir" : "Cancelar",
+                  style: const TextStyle(color: Colors.white),
+                ),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                      _allowConclusion ? Colors.green : Colors.red), // Set the background color of the icon
+                ),
+              ),
+            ),
+          )
+        else
+          Positioned(
+            top: 20.0,
+            left: 0.0,
+            right: 0.0,
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              color: Theme.of(context).colorScheme.surface,
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                   Text(
+                    "Corrida em andamento. Ative o mapa para ver o passageiro.",
+                    style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                    textAlign: TextAlign.center,
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: _endTripDialog,
+                    icon: Icon(
+                      _allowConclusion ? Icons.check : Icons.close,
+                      color: Colors.white,
+                    ),
+                    label: Text(
+                      _allowConclusion ? "Concluir" : "Cancelar",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          _allowConclusion ? Colors.green : Colors.red), // Set the background color of the icon
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+
+  
   void _createMarkerIcon() async {
     try {
-      final String url = '${ApiClient.instance.baseUrl}/api/marker/${_controller.currentActivity!.passenger!.userId}';
-      _passengerIcon = await getMarkerImageFromUrl(url,targetWidth: 120);
-
+      
       _markers.add(Marker(
         markerId: const MarkerId('origin'),
         position: LatLng(_controller.currentActivity!.origin.latitude!,
@@ -74,6 +202,29 @@ class _TripState extends State<Trip> {
   }
 
   _listenTrip() async {
+
+    //init passenger location
+    FirebaseDatabase.instance
+        .ref('trips')
+        .child(_controller.currentActivity!.uuid!)
+        .child('passenger').get().then((value) async {
+          if(value.exists){
+            final String url = '${ApiClient.instance.baseUrl}/api/marker/${_controller.currentActivity!.passenger!.userId}';
+            final data = value.value as Map;
+            _markers.add(Marker(
+              markerId: const MarkerId('passenger'),
+              position: LatLng(
+                  data['latitude'],
+                  data['longitude']),
+              icon: _passengerIcon ??= await getMarkerImageFromUrl(url,targetWidth: 120) ,
+              infoWindow: const InfoWindow(
+                title: 'Seu Passageiro',
+              ),
+            ));
+            _checkRadius();
+          }
+        });
+
     _stream = FirebaseDatabase.instance
         .ref('trips')
         .child(_controller.currentActivity!.uuid!)
@@ -85,27 +236,27 @@ class _TripState extends State<Trip> {
         if(data['cancelled'] == true && data['whoCancelled'] == 'p'){
           _controller.cancelActivity(alreadyCancelled: true);
           _stream.cancel();
-             showDialog(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  title: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const Text('Corrida cancelada pelo passageiro !'),
-                      SizedBox(height: 10,),
-                      Text('Motivo: ${data['cancellingReason']}'),
-                    ],
-                  ),
-                  actions: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(ctx);
-                      },
-                      child: const Text('OK'),
-                    ),
-                  ],
+          showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const Text('Corrida cancelada pelo passageiro !'),
+                  SizedBox(height: 10,),
+                  Text('Motivo: ${data['cancellingReason']}'),
+                ],
+              ),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                  },
+                  child: const Text('OK'),
                 ),
-              );
+              ],
+            ),
+          );
           return;
         }
         
@@ -120,110 +271,43 @@ class _TripState extends State<Trip> {
             title: 'Seu Passageiro',
           ),
         ));
-        setState(() {});
+        _checkRadius();
+      }else{
+        _controller.cancelActivity(alreadyCancelled: true);
+        _stream.cancel();
       }
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        if (_showMap)
-          GoogleMap(
-            zoomControlsEnabled: false,
-            myLocationEnabled: true,
-            myLocationButtonEnabled: true,
-            polylines: Set<Polyline>.of(_polylines),
-            initialCameraPosition: CameraPosition(
-                target: LatLng(_controller.currentActivity!.origin.latitude!,
-                    _controller.currentActivity!.origin.longitude!),
-                zoom: 16),
-            markers: Set<Marker>.of(_markers),
-          ),
-        Positioned(
-          bottom: 10.0,
-          right: 10.0,
-          child: Tooltip(
-            message: 'Esconder/Exibir Mapa',
-            child: FloatingActionButton(
-              onPressed: () {
-                setState(() {
-                  _showMap = !_showMap;
-                });
-              },
-              child: Icon(
-                _showMap ? Icons.map : Icons.map_outlined,
-                color: Colors.white,
-              ),
-              backgroundColor: Colors.blue,
-            ),
-          ),
-        ),
-        if (_showMap)
-          Positioned(
-            top: 20.0,
-            left: 0.0,
-            right: 0.0,
-            child: Center(
-              child: ElevatedButton.icon(
-                onPressed: _endTripDialog,
-                icon: const Icon(
-                  Icons.close,
-                  color: Colors.white,
-                ),
-                label: const Text(
-                  "Cancelar",
-                  style: TextStyle(color: Colors.white),
-                ),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(
-                      Colors.red), // Set the background color of the icon
-                ),
-              ),
-            ),
-          )
-        else
-          Positioned(
-            top: 20.0,
-            left: 0.0,
-            right: 0.0,
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              color: Theme.of(context).colorScheme.surface,
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                   Text(
-                    "Corrida em andamento. Ative o mapa para ver o passageiro.",
-                    style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-                    textAlign: TextAlign.center,
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: _endTripDialog,
-                    icon: const Icon(
-                      Icons.close,
-                      color: Colors.white,
-                    ),
-                    label: const Text(
-                      "Cancelar",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                          Colors.red), // Set the background color of the icon
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-      ],
+   _checkRadius() {
+    final destination = _controller.currentActivity!.destiny;
+    final passengerPosition = _markers
+        .firstWhere((marker) => marker.markerId.value == 'passenger')
+        .position;
+
+    final passengerDistance = Geolocator.distanceBetween(
+      passengerPosition.latitude,
+      passengerPosition.longitude,
+      destination.latitude!,
+      destination.longitude!,
     );
+
+    if (mounted) {
+      setState(() {
+        _allowConclusion = passengerDistance <= _acceptableRadius;
+      });
+    }
+  
   }
 
+
    void _endTripDialog() {
+
+    if (_allowConclusion) {
+      _finishTripDialog();
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -248,8 +332,8 @@ class _TripState extends State<Trip> {
   }
 
   TextEditingController _cancellingReason = TextEditingController();
-  final _formCancelamentoKey = GlobalKey<FormState>();
-  bool _cancelling = false;
+  final _formDialogKey = GlobalKey<FormState>();
+  bool _isDialogLoading = false;
 
   void _cancelTripDialog() {
     showDialog(
@@ -258,7 +342,7 @@ class _TripState extends State<Trip> {
         builder: (context, setState) {
           return AlertDialog(
             title: Form(
-              key: _formCancelamentoKey,
+              key: _formDialogKey,
               child: Column(
               children: [
                 Text('Insira o motivo do cancelamento: '),
@@ -276,16 +360,16 @@ class _TripState extends State<Trip> {
             actions: [
               ElevatedButton(
                 onPressed: () async {
-                  if (_formCancelamentoKey.currentState!.validate()) {
+                  if (_formDialogKey.currentState!.validate()) {
                     setState(() {
-                      _cancelling = true;
+                      _isDialogLoading = true;
                     });
                     final ret = await _controller.cancelActivity(
                       trip: _controller.currentActivity!,
                       reason: _cancellingReason.text,
                     );
                     setState(() {
-                      _cancelling = false;
+                      _isDialogLoading = false;
                     });
                     
                     if (!ret) {
@@ -297,7 +381,7 @@ class _TripState extends State<Trip> {
 
                   }
                 },
-                child: _cancelling ? Padding(
+                child: _isDialogLoading ? Padding(
                   padding: EdgeInsets.all(8.0),
                   child: CircularProgressIndicator(color: Theme.of(context).colorScheme.secondary,),
                 ): Text('Cancelar'),
@@ -307,6 +391,120 @@ class _TripState extends State<Trip> {
         }
       ),
     );
+  }
+
+  double _evaluation = 0;
+  TextEditingController _obs = TextEditingController();
+
+  _finishTripDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(builder: (context, setState) {
+        return AlertDialog(
+          title: Form(
+            key: _formDialogKey,
+            child: Column(
+              children: [
+                Text(
+                  'Sua opinião é muito importante para nós! Por gentileza, avalie o passageiro:',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 10),
+                FormField(
+                  builder: (field) => RatingBar(
+                    initialRating: _evaluation,
+                    itemCount: 5,
+                    allowHalfRating: true,
+                    glowColor: Colors.amber,
+                    glowRadius: 1,
+                    ratingWidget: RatingWidget(
+                        full: const Icon(Icons.star, color: Colors.amber),
+                        half: const Icon(Icons.star_half, color: Colors.amber),
+                        empty: const Icon(
+                          Icons.star_outline_outlined,
+                          color: Color.fromARGB(255, 209, 203, 203),
+                        )),
+                    onRatingUpdate: (rate) {
+                      _evaluation = rate;
+                    },
+                  ),
+                  validator: (value) {
+                    if (_evaluation == 0) {
+                      toastError(context, 'Por gentileza, avalie o passageiro');
+                      return 'Por gentileza, avalie o passageiro';
+                    }
+                    return null;
+                  },
+                ),
+                Text(
+                  'Observação: ',
+                  style: Theme.of(context).textTheme.titleMedium,
+                  textAlign: TextAlign.start,
+                ),
+                TextFormField(
+                  controller: _obs,
+                  maxLines: 2,
+                  decoration: InputDecoration(
+                    fillColor: Colors.white,
+                    filled: true,
+                    hintText:
+                        'Deixe uma observação/comentário sobre a corrida caso necessário',
+                    hintStyle: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(color: Colors.grey[600]),
+                  ),
+                )
+              ],
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () async {
+                if (_formDialogKey.currentState!.validate()) {
+                  setState(() {
+                    _isDialogLoading = true;
+                  });
+                  final ret = await _controller.finishActivity(
+                    trip: _controller.currentActivity!,
+                    evaluation: _evaluation,
+                    evaluationComment: _obs.text,
+                  );
+                  setState(() {
+                    _isDialogLoading = false;
+                  });
+                  if (!ret) {
+                    toastError(context,
+                        'Houve um erro ao concluir sua corrida! Tente novamente.');
+                  } else {
+                    Navigator.pop(ctx);
+                    toastSuccess(context,
+                        'Corrida concluída com sucesso! Agradecemos pelo serviço prestado!');
+                  }
+                }
+              },
+              child: _isDialogLoading
+                  ? Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: CircularProgressIndicator(
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                    )
+                  : Text('Concluir'),
+            ),
+          ],
+        );
+      }),
+    );
+  }
+
+  @override
+  void dispose() {
+    try{
+      _stream.cancel();
+    }catch(e){}
+    super.dispose();
   }
 
 
