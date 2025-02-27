@@ -34,7 +34,7 @@ class LoginController {
       return true;
     } on DioException catch (e) {
       String message =  e.response?.data['message'] ?? e.toString();
-      showAlert(context, "Erro ao realizar login", "Verifique suas credenciais", message);
+      showAlert(context, "Erro ao realizar login", sol: "Verifique suas credenciais", error: message);
       return false;
     }
   }

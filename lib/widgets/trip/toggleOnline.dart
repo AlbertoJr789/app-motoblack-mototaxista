@@ -45,7 +45,7 @@ class _ToggleOnlineState extends State<ToggleOnline> {
         _listenLocation();
       } else {
         showAlert(context, "Erro ao iniciar sessão",
-            "Tente novamente mais tarde", '');
+            sol: "Tente novamente mais tarde", error: 'Erro ao iniciar sessão');
       }
       setState(() {});
     } else {

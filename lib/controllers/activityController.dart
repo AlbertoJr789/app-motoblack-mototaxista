@@ -26,7 +26,7 @@ class ActivityController extends ChangeNotifier {
         _hasMore = true;
         activities = [];
       }
-      Response response = await Activity.getActivities(_page);
+      Response response = await Activity.getActivities(page: _page);
       if (response.data['success']) {
         final data = response.data['data']['result'];
         _hasMore = response.data['data']['hasMore'];
@@ -154,26 +154,24 @@ class ActivityController extends ChangeNotifier {
     }
   }
 
-   //activity disk persistance, in case user closes the app
-  storeCurrentActivity(Map<String,dynamic> data) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('currentActivity',jsonEncode(data));
-    currentActivity = Activity.fromJson(data);
-    notifyListeners();
-  }
-
-  getCurrentActivity() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? activity = prefs.getString('currentActivity');
-    currentActivity = activity != null ? Activity.fromJson(jsonDecode(activity)) : null;
-    if(currentActivity != null){
-      notifyListeners();
+  checkCurrentActivity() async {    
+    if(currentActivity == null){
+      //get pendent activity from API
+      final response = await Activity.getActivities(unrated: true);
+      if (response.data['success']) {
+          final data = response.data['data']['result'];
+          try{
+            currentActivity = Activity.fromJson(data[0]);
+          }catch(e){
+            currentActivity = null;
+          }
+      } else {
+        throw response.data['message'];
+      }
     }
   }
 
   removeCurrentActivity() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove('currentActivity');
     currentActivity = null;
     notifyListeners();
   }

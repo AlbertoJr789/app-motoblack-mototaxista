@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:app_motoblack_mototaxista/controllers/activityController.dart';
 import 'package:app_motoblack_mototaxista/controllers/apiClient.dart';
 import 'package:app_motoblack_mototaxista/models/Activity.dart';
+import 'package:app_motoblack_mototaxista/util/util.dart';
 import 'package:app_motoblack_mototaxista/widgets/assets/toast.dart';
 import 'package:app_motoblack_mototaxista/widgets/trip/tripIcon.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -231,35 +232,7 @@ class _TripState extends State<Trip> {
         .onValue
         .listen((querySnapshot) {
       if (querySnapshot.snapshot.exists) {
-        final data = querySnapshot.snapshot.value as Map;
-        
-        if(data['cancelled'] == true && data['whoCancelled'] == 'p'){
-          _controller.cancelActivity(alreadyCancelled: true);
-          _stream.cancel();
-          showDialog(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              title: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  const Text('Corrida cancelada pelo passageiro !'),
-                  SizedBox(height: 10,),
-                  Text('Motivo: ${data['cancellingReason']}'),
-                ],
-              ),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
-          );
-          return;
-        }
-        
+        final data = querySnapshot.snapshot.value as Map;  
         _markers.removeWhere((marker) => marker.markerId.value == 'passenger');
         _markers.add(Marker(
           markerId: const MarkerId('passenger'),
@@ -273,8 +246,7 @@ class _TripState extends State<Trip> {
         ));
         _checkRadius();
       }else{
-        _controller.cancelActivity(alreadyCancelled: true);
-        _stream.cancel();
+         _controller.checkCurrentActivity();
       }
     });
   }

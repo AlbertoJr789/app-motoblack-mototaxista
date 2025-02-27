@@ -5,6 +5,7 @@ import 'package:app_motoblack_mototaxista/models/Vehicle.dart';
 import 'package:dio/dio.dart';
 
 enum ActivityType { unknown, trip, carTrip, delivery }
+enum WhoCancelled { unknown, passenger, agent }
 
 ActivityType activityTypeToEnum(int type) {
   switch (type) {
@@ -18,6 +19,18 @@ ActivityType activityTypeToEnum(int type) {
       return  ActivityType.unknown;
   }
 }
+
+WhoCancelled whoCancelledToEnum(int whoCancelled) {
+  switch (whoCancelled) {
+    case 1:
+      return WhoCancelled.passenger;
+    case 2: 
+      return WhoCancelled.agent;
+    default:
+      return WhoCancelled.unknown;
+  }
+}
+
 
 class Activity {
   int? id;
@@ -33,6 +46,7 @@ class Activity {
   String? obs;
   String? route;
   bool? canceled;
+  WhoCancelled? whoCancelled;
   String? cancellingReason;
   DateTime? createdAt;
   DateTime? finishedAt;
@@ -52,6 +66,7 @@ class Activity {
        this.evaluationPassenger,
       this.obs,
        this.canceled,
+       this.whoCancelled,
        this.route,
       this.cancellingReason,
        this.createdAt,
@@ -74,7 +89,8 @@ class Activity {
         obs: map['agentObs'],
         cancellingReason: map['cancellingReason'],
         createdAt: DateTime.parse(map['createdAt']),
-        finishedAt: map['finishedAt'] != null ? DateTime.parse(map['finishedAt']) : null
+        finishedAt: map['finishedAt'] != null ? DateTime.parse(map['finishedAt']) : null,
+        whoCancelled: map['whoCancelled'] != null ? whoCancelledToEnum(map['whoCancelled']) : null
         );
   }
 
@@ -114,7 +130,11 @@ class Activity {
     }
   }
 
-  static Future<Response> getActivities(int page) async {
+  static Future<Response> getActivities({int page=1,bool unrated=false}) async {
+    var queryParameters = {'page': page};
+    if(unrated){
+      queryParameters['unrated'] = 1;
+    }
     return await apiClient.dio.get(
         '/api/activity',
         options: Options(
@@ -123,7 +143,7 @@ class Activity {
             'accept': 'application/json',
           },
         ),
-        queryParameters: {'page': page},
+        queryParameters: queryParameters,
       );
   }
 
