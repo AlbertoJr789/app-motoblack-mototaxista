@@ -88,9 +88,9 @@ class Activity {
         canceled: map['cancelled'] == 1 ? true : false,
         obs: map['agentObs'],
         cancellingReason: map['cancellingReason'],
+        whoCancelled: map['whoCancelled'] != null ? whoCancelledToEnum(map['whoCancelled']) : null,
         createdAt: DateTime.parse(map['createdAt']),
         finishedAt: map['finishedAt'] != null ? DateTime.parse(map['finishedAt']) : null,
-        whoCancelled: map['whoCancelled'] != null ? whoCancelledToEnum(map['whoCancelled']) : null
         );
   }
 
@@ -130,10 +130,13 @@ class Activity {
     }
   }
 
-  static Future<Response> getActivities({int page=1,bool unrated=false}) async {
+  static Future<Response> getActivities({int page=1,bool unrated=false,bool cancelled=false}) async {
     var queryParameters = {'page': page};
     if(unrated){
       queryParameters['unrated'] = 1;
+    }
+    if(cancelled){
+      queryParameters['cancelled'] = 1;
     }
     return await apiClient.dio.get(
         '/api/activity',

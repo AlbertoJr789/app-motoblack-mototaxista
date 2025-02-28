@@ -14,8 +14,11 @@ class ActivityController extends ChangeNotifier {
   bool _hasMore = true;
   String error = '';
   List<Activity> activities = [];
+  
   Activity? currentActivity;
-
+  bool _enableTrip = false;
+  bool _checkCancelled = true;
+  
   Position? currentLocation;
   static final ApiClient apiClient = ApiClient.instance;
 
@@ -155,26 +158,32 @@ class ActivityController extends ChangeNotifier {
   }
 
   checkCurrentActivity() async {    
-    if(currentActivity == null){
-      //get pendent activity from API
-      final response = await Activity.getActivities(unrated: true);
-      if (response.data['success']) {
-          final data = response.data['data']['result'];
-          try{
-            currentActivity = Activity.fromJson(data[0]);
-          }catch(e){
-            currentActivity = null;
-          }
-      } else {
-        throw response.data['message'];
-      }
+    //get pendent activity from API
+    final response = await Activity.getActivities(unrated: _checkCancelled ? false : true,cancelled: _checkCancelled);
+    if (response.data['success']) {
+        final data = response.data['data']['result'];
+        try{
+          currentActivity = Activity.fromJson(data[0]);
+        }catch(e){
+          currentActivity = null;
+        }
+    } else {
+      throw response.data['message'];
     }
   }
 
-  removeCurrentActivity() async {
-    currentActivity = null;
-    notifyListeners();
+ toggleTrip({bool enabled = true,bool notify = false}){
+    _enableTrip = enabled;
+    if(notify){
+      notifyListeners();
+    }
   }
 
+  get enableTrip => _enableTrip;
+
+  removeCurrentActivity() async {
+    currentActivity = null;
+    toggleTrip(enabled: true,notify: true);
+  }
 
 }

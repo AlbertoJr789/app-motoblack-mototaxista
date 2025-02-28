@@ -108,7 +108,7 @@ class _ToggleOnlineState extends State<ToggleOnline> {
   _showTripSuggestion(tripId) async {
     _suggesting = true;
     Activity? activity = await Activity.getApi(tripId);
-    if (activity == null) {
+    if (activity == null && _controller.currentActivity == null) {
       _suggesting = false;
       return;
     }
@@ -116,7 +116,7 @@ class _ToggleOnlineState extends State<ToggleOnline> {
       context: context,
       builder: (ctx) => StatefulBuilder(builder: (context, setState) {
         return AlertDialog(
-          title: ActivitySuggestion(activity: activity),
+          title: ActivitySuggestion(activity: activity!),
           actions: [
             ElevatedButton(
               onPressed: () {
@@ -143,40 +143,10 @@ class _ToggleOnlineState extends State<ToggleOnline> {
                   setState(() {
                     _acceptingTrip = false;
                   });
-                  FToast().init(context).showToast(
-                      child: MyToast(
-                        msg: const Text(
-                          'Erro ao aceitar corrida, tente novamente.',
-                          style: const TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                        icon: const Icon(
-                          Icons.error,
-                          color: Colors.white,
-                        ),
-                        color: Colors.redAccent,
-                      ),
-                      gravity: ToastGravity.BOTTOM,
-                      toastDuration: const Duration(seconds: 5));
+                  toastError(context, 'Erro ao aceitar corrida, tente novamente.',);
                 } else {
                   Navigator.pop(context);
-                  FToast().init(context).showToast(
-                      child: MyToast(
-                        msg: const Text(
-                          'Aceite feito com sucesso, inicializando mapa...',
-                          style: const TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                        icon: const Icon(
-                          Icons.error,
-                          color: Colors.white,
-                        ),
-                        color: Colors.greenAccent,
-                      ),
-                      gravity: ToastGravity.BOTTOM,
-                      toastDuration: const Duration(seconds: 5));
+                  toastSuccess(context, 'Aceite feito com sucesso, inicializando mapa...');
                 }
               },
               child: _acceptingTrip

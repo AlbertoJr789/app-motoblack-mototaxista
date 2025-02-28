@@ -246,7 +246,7 @@ class _TripState extends State<Trip> {
         ));
         _checkRadius();
       }else{
-         _controller.checkCurrentActivity();
+         _controller.toggleTrip(enabled: false,notify: true);
       }
     });
   }

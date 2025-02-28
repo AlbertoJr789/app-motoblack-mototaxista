@@ -19,22 +19,16 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home>
-    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<Home> {
-  @override
-  bool get wantKeepAlive => true;
-
+class _HomeState extends State<Home> {
+  
   late ActivityController _tripController;
-  bool _showTrip = true;
   bool _error = false;
+  bool _isCheckingActivity = false;
 
   @override
   void initState() {
     super.initState();
     _tripController = Provider.of<ActivityController>(context, listen: false);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-        _checkActivity();
-    });
   }
 
 
@@ -46,14 +40,16 @@ class _HomeState extends State<Home>
       if(_tripController.currentActivity != null){
         if(_tripController.currentActivity!.whoCancelled == WhoCancelled.passenger){
           showAlert(context, 'A corrida foi cancelada pelo passageiro', sol: 'Motivo: ${_tripController.currentActivity!.cancellingReason}');
-          _tripController.removeCurrentActivity();
         }else{
-          if(_tripController.currentActivity!.finishedAt != null){
+          if(_tripController.currentActivity!.finishedAt != null && _tripController.currentActivity!.canceled == false){
             _ratePendentTripDialog();
-            _showTrip = false;
+            _tripController.toggleTrip(enabled: false);
+            return;
           }
         }
       }
+      _tripController.removeCurrentActivity();
+      _isCheckingActivity = false;
     }catch(e){
       _error = true;
     }
@@ -63,11 +59,18 @@ class _HomeState extends State<Home>
   Widget build(BuildContext context) {
     _tripController = context.watch<ActivityController>();
     
+    if(!_tripController.enableTrip && !_isCheckingActivity){
+      _isCheckingActivity = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+          _checkActivity();
+      });
+    }
+
     Widget widget;
     if(_error){
         widget = ErrorMessage(msg: 'Houve um erro ao tentar verificar seus status', tryAgainAction: _checkActivity);
     }else{
-      if(_tripController.currentActivity != null && _showTrip){
+      if(_tripController.currentActivity != null && _tripController.enableTrip){
         widget = const Trip();
       }else{
         widget = Center(
@@ -85,7 +88,8 @@ class _HomeState extends State<Home>
           const SizedBox(
             height: 12,
           ),
-          const ToggleOnline()
+          if(_tripController.enableTrip)
+            const ToggleOnline()
         ],
       )); 
       } 
@@ -197,6 +201,7 @@ class _HomeState extends State<Home>
                     toastSuccess(context,
                         'Corrida concluída com sucesso! Agradecemos pelo serviço prestado!');
                     _tripController.removeCurrentActivity();
+                    _isCheckingActivity = false;
                   }
                 }
               },
