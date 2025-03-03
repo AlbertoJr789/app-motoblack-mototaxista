@@ -246,8 +246,10 @@ class _TripState extends State<Trip> {
         ));
         _checkRadius();
       }else{
-         _controller.checkCancelled = _controller.currentActivity!.id!;
-         _controller.toggleTrip(enabled: false,notify: true);
+        if(_isDialogLoading == false){
+          _controller.checkCancelled = _controller.currentActivity!.id!;
+          _controller.toggleTrip(enabled: false,notify: true);
+        }
       }
     });
   }
@@ -348,8 +350,8 @@ class _TripState extends State<Trip> {
                     if (!ret) {
                       toastError(context, 'Houve um erro ao cancelar sua corrida! Tente novamente.');
                     }else{
-                      _stream.cancel();
                       Navigator.pop(ctx);
+                      toastSuccess(context, 'Corrida cancelada com sucesso!');
                     }
 
                   }
@@ -474,6 +476,7 @@ class _TripState extends State<Trip> {
 
   @override
   void dispose() {
+    print('disposex');
     try{
       _stream.cancel();
     }catch(e){}

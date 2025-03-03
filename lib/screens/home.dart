@@ -122,7 +122,7 @@ class _HomeState extends State<Home> {
             child: Column(
               children: [
                 Text(
-                  'Ooops, parece que o passageiro finalizou a corrida e ainda não o avaliou !',
+                  'Ooops, parece que o passageiro finalizou a corrida e você ainda não o avaliou !',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
