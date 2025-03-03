@@ -75,9 +75,12 @@ class _ToggleOnlineState extends State<ToggleOnline> {
             if (data.containsKey('trips')) {
               final trips = data['trips'];
               final tripSuggestion =
-                  trips.firstWhere((element) => element['refused'] == false);
+                  trips.entries.firstWhere(
+                    (entry) => 
+                    entry.value == false
+                    ).key;
               if (tripSuggestion != null) {
-                _showTripSuggestion(tripSuggestion['id']);
+                _showTripSuggestion(tripSuggestion);
               }
             }
           }
@@ -120,7 +123,7 @@ class _ToggleOnlineState extends State<ToggleOnline> {
           actions: [
             ElevatedButton(
               onPressed: () {
-                _controller.refuseTrip(_uuid);
+                _controller.refuseTrip(activity.id!.toString(),_uuid);
                 Navigator.pop(ctx);
               },
               style: ButtonStyle(

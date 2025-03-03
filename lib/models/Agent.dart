@@ -52,5 +52,9 @@ class Agent {
    SharedPreferences.getInstance().then((instance)=> instance.setString('uuid', uuid));
   }
 
+  static removeUuid() {
+    SharedPreferences.getInstance().then((instance)=> instance.remove('uuid'));
+  }
+
 
 }

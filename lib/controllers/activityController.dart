@@ -4,6 +4,7 @@ import 'package:app_motoblack_mototaxista/controllers/apiClient.dart';
 import 'package:app_motoblack_mototaxista/models/Activity.dart';
 import 'package:app_motoblack_mototaxista/models/Agent.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -101,12 +102,16 @@ class ActivityController extends ChangeNotifier {
     }
   }
 
-  Future<bool> refuseTrip(id) async {
-    var response = null;
+  Future<bool> refuseTrip(activity,agent) async {
     try {
-      
+      FirebaseDatabase.instance
+          .ref('availableAgents')
+          .child(agent)
+          .child('trips')
+          .child(activity)
+          .set(true);
       return true;
-    } on DioException catch (e) {
+    } catch (e) {
       return false;
     }
   }
