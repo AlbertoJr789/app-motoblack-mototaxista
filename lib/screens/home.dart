@@ -40,6 +40,7 @@ class _HomeState extends State<Home> {
       if(_tripController.currentActivity != null){
         if(_tripController.currentActivity!.whoCancelled == WhoCancelled.passenger){
           showAlert(context, 'A corrida foi cancelada pelo passageiro', sol: 'Motivo: ${_tripController.currentActivity!.cancellingReason}');
+          _tripController.checkCancelled = false;
         }else{
           if(_tripController.currentActivity!.finishedAt != null && _tripController.currentActivity!.canceled == false){
             _ratePendentTripDialog();
@@ -50,6 +51,7 @@ class _HomeState extends State<Home> {
       }
       _tripController.removeCurrentActivity();
       _isCheckingActivity = false;
+      _error = false;
     }catch(e){
       _error = true;
     }

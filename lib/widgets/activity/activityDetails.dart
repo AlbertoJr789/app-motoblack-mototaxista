@@ -76,8 +76,9 @@ class _ActivityDetailsState extends State<ActivityDetails> {
     final dynamic showEval, showObs;
 
     if (widget.activity.canceled!) {
+      String whoCancelled = widget.activity.whoCancelled == WhoCancelled.agent ? 'por você!' : 'pelo passageiro!';
       showEval =
-          InfoBanner(type: 'danger', msg: 'Esta atividade foi cancelada!');
+          InfoBanner(type: 'danger', msg: 'Esta atividade foi cancelada ${whoCancelled}');
       showObs = Text(
         'Justificativa de cancelamento: ${widget.activity.cancellingReason ?? '-'}',
         style: const TextStyle(fontSize: 18),

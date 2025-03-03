@@ -23,9 +23,9 @@ ActivityType activityTypeToEnum(int type) {
 WhoCancelled whoCancelledToEnum(int whoCancelled) {
   switch (whoCancelled) {
     case 1:
-      return WhoCancelled.passenger;
-    case 2: 
       return WhoCancelled.agent;
+    case 2: 
+      return WhoCancelled.passenger;
     default:
       return WhoCancelled.unknown;
   }
