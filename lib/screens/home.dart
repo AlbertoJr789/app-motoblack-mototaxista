@@ -40,7 +40,7 @@ class _HomeState extends State<Home> {
       if(_tripController.currentActivity != null){
         if(_tripController.currentActivity!.whoCancelled == WhoCancelled.passenger){
           showAlert(context, 'A corrida foi cancelada pelo passageiro', sol: 'Motivo: ${_tripController.currentActivity!.cancellingReason}');
-          _tripController.checkCancelled = false;
+          _tripController.checkCancelled = 0;
         }else{
           if(_tripController.currentActivity!.finishedAt != null && _tripController.currentActivity!.canceled == false){
             _ratePendentTripDialog();
@@ -122,7 +122,7 @@ class _HomeState extends State<Home> {
             child: Column(
               children: [
                 Text(
-                  'Ooops, você não avaliou a sua última corrida!',
+                  'Ooops, parece que o passageiro finalizou a corrida e ainda não o avaliou !',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
