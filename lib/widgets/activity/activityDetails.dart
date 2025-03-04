@@ -266,6 +266,7 @@ class _ActivityDetailsState extends State<ActivityDetails> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
         
+          if(activity.evaluationAgent != null)
             const Flexible(
               child: Text(
                 'Avaliação que você deu ao passageiro',

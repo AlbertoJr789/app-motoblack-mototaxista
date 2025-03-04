@@ -36,7 +36,54 @@ class _ToggleOnlineState extends State<ToggleOnline> {
   late StreamSubscription _locationListener;
   late Position _currentLocation;
 
-  void _toggleOnline(b) async {
+  @override
+  initState() {
+    super.initState();
+    _listenOnline();
+    _listenLocation();
+    _controller = Provider.of<ActivityController>(context, listen: false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedToggleSwitch<bool>.dual(
+      current: _online,
+      first: false,
+      second: true,
+      spacing: 45.0,
+      animationDuration: const Duration(milliseconds: 600),
+      style: const ToggleStyle(
+        borderColor: Colors.transparent,
+        indicatorColor: Colors.white,
+        backgroundColor: Colors.amber,
+      ),
+      customStyleBuilder: (context, local, global) => ToggleStyle(
+          backgroundGradient: LinearGradient(
+        colors: const [Colors.green, Colors.red],
+        stops: [
+          global.position - (1 - 2 * max(0, global.position - 0.5)) * 0.5,
+          global.position + max(0, 2 * (global.position - 0.5)) * 0.5,
+        ],
+      )),
+      borderWidth: 6.0,
+      height: 60.0,
+      loadingIconBuilder: (context, global) => CupertinoActivityIndicator(
+          color: Color.lerp(Colors.red, Colors.green, global.position)),
+      onChanged: _toggleOnline,
+      iconBuilder: (value) => value
+          ? const Icon(Icons.power_outlined, color: Colors.green, size: 32.0)
+          : const Icon(Icons.power_settings_new_rounded,
+              color: Colors.red, size: 32.0),
+      textBuilder: (value) => Center(
+          child: Text(
+        value ? 'On' : 'Off',
+        style: const TextStyle(
+            color: Colors.white, fontSize: 30.0, fontWeight: FontWeight.w600),
+      )),
+    );
+  }
+
+    void _toggleOnline(b) async {
     if (b) {
       _uuid = await _controller.getOnline();
       if (_uuid.isNotEmpty) {
@@ -112,18 +159,25 @@ class _ToggleOnlineState extends State<ToggleOnline> {
     _suggesting = true;
     Activity? activity = await Activity.getApi(tripId);
     if (activity == null && _controller.currentActivity == null) {
+       FirebaseDatabase.instance
+          .ref('availableAgents')
+          .child(_uuid)
+          .child('trips')
+          .child(tripId.toString())
+          .set(true);
       _suggesting = false;
       return;
     }
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (ctx) => StatefulBuilder(builder: (context, setState) {
         return AlertDialog(
           title: ActivitySuggestion(activity: activity!),
           actions: [
             ElevatedButton(
               onPressed: () {
-                _controller.refuseTrip(activity.id!.toString(),_uuid);
+                _controller.refuseTrip(activity,_uuid);
                 Navigator.pop(ctx);
               },
               style: ButtonStyle(
@@ -164,53 +218,6 @@ class _ToggleOnlineState extends State<ToggleOnline> {
           ],
         );
       }),
-    );
-  }
-
-  @override
-  initState() {
-    super.initState();
-    _listenOnline();
-    _listenLocation();
-    _controller = Provider.of<ActivityController>(context, listen: false);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedToggleSwitch<bool>.dual(
-      current: _online,
-      first: false,
-      second: true,
-      spacing: 45.0,
-      animationDuration: const Duration(milliseconds: 600),
-      style: const ToggleStyle(
-        borderColor: Colors.transparent,
-        indicatorColor: Colors.white,
-        backgroundColor: Colors.amber,
-      ),
-      customStyleBuilder: (context, local, global) => ToggleStyle(
-          backgroundGradient: LinearGradient(
-        colors: const [Colors.green, Colors.red],
-        stops: [
-          global.position - (1 - 2 * max(0, global.position - 0.5)) * 0.5,
-          global.position + max(0, 2 * (global.position - 0.5)) * 0.5,
-        ],
-      )),
-      borderWidth: 6.0,
-      height: 60.0,
-      loadingIconBuilder: (context, global) => CupertinoActivityIndicator(
-          color: Color.lerp(Colors.red, Colors.green, global.position)),
-      onChanged: _toggleOnline,
-      iconBuilder: (value) => value
-          ? const Icon(Icons.power_outlined, color: Colors.green, size: 32.0)
-          : const Icon(Icons.power_settings_new_rounded,
-              color: Colors.red, size: 32.0),
-      textBuilder: (value) => Center(
-          child: Text(
-        value ? 'On' : 'Off',
-        style: const TextStyle(
-            color: Colors.white, fontSize: 30.0, fontWeight: FontWeight.w600),
-      )),
     );
   }
 

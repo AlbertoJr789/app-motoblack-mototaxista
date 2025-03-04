@@ -32,7 +32,7 @@ class ActivitySuggestion extends StatelessWidget {
                           Icons.person_off_outlined,
                           color: Colors.black,
                         ),
-                    imageUrl: activity.passenger!.avatar!),
+                    imageUrl: activity.passenger!.avatar ?? ''),
               ),
               Text(
                 activity.passenger!.name,

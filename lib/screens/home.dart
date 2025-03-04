@@ -38,18 +38,29 @@ class _HomeState extends State<Home> {
       _error = false;
 
       if(_tripController.currentActivity != null){
-        if(_tripController.currentActivity!.whoCancelled == WhoCancelled.passenger){
-          showAlert(context, 'A corrida foi cancelada pelo passageiro', sol: 'Motivo: ${_tripController.currentActivity!.cancellingReason}');
-          _tripController.checkCancelled = 0;
+
+        if(_tripController.currentActivity!.canceled == true){
+           if(_tripController.currentActivity!.whoCancelled == WhoCancelled.passenger){
+            _tripController.checkCancelled = 0;
+            String reason = _tripController.currentActivity!.cancellingReason ?? 'Não informado';
+            _tripController.removeCurrentActivity();
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              showAlert(context, 
+                  'A corrida foi cancelada pelo passageiro', 
+                  sol: 'Motivo: $reason');
+            });
+          }
         }else{
-          if(_tripController.currentActivity!.finishedAt != null && _tripController.currentActivity!.canceled == false){
+          if(_tripController.currentActivity!.finishedAt != null){
             _ratePendentTripDialog();
-            _tripController.toggleTrip(enabled: false);
             return;
+          }else{
+            _tripController.toggleTrip(enabled: true);
           }
         }
+      }else{
+        _tripController.toggleTrip(enabled: true);
       }
-      _tripController.removeCurrentActivity();
       _isCheckingActivity = false;
       _error = false;
     }catch(e){
@@ -112,6 +123,7 @@ class _HomeState extends State<Home> {
   TextEditingController _obs = TextEditingController();
 
   _ratePendentTripDialog() {
+    print('avaliar corrida');
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -204,6 +216,8 @@ class _HomeState extends State<Home> {
                         'Corrida concluída com sucesso! Agradecemos pelo serviço prestado!');
                     _tripController.removeCurrentActivity();
                     _isCheckingActivity = false;
+                    _evaluation = 0;
+                    _obs.clear();
                   }
                 }
               },

@@ -2,7 +2,7 @@
 //generic function that shows a dialog
 import 'package:flutter/material.dart';
 
-void showAlert(BuildContext context,String message, {String? sol,String? error}) {
+void showAlert(BuildContext context,String message, {String? sol,String? error,Function? onPressed}) {
     String errorMessage = error != null ? 'Motivo do erro: ${error}\n\n': '';
     showDialog(
       context: context,
@@ -13,6 +13,9 @@ void showAlert(BuildContext context,String message, {String? sol,String? error})
           ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
+              if(onPressed != null){
+                onPressed();
+              }
             },
             child: const Text('OK'),
           )

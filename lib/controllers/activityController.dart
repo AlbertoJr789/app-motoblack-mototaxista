@@ -102,14 +102,20 @@ class ActivityController extends ChangeNotifier {
     }
   }
 
-  Future<bool> refuseTrip(activity,agent) async {
+  Future<bool> refuseTrip(Activity activity,String agent) async {
     try {
       FirebaseDatabase.instance
           .ref('availableAgents')
           .child(agent)
           .child('trips')
-          .child(activity)
+          .child(activity.id.toString())
           .set(true);
+      FirebaseDatabase.instance
+          .ref('trips')
+          .child(activity.uuid!)
+          .child('agent')
+          .child('accepting')
+          .set(false);
       return true;
     } catch (e) {
       return false;
@@ -191,7 +197,7 @@ class ActivityController extends ChangeNotifier {
     }
   }
 
-  get enableTrip => _enableTrip;
+  bool get enableTrip => _enableTrip;
 
   removeCurrentActivity() async {
     currentActivity = null;

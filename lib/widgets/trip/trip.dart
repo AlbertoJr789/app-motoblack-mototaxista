@@ -67,7 +67,6 @@ class _TripState extends State<Trip> {
                   Circle(
                     circleId: const CircleId('destination-area'),
                     onTap: (){
-                      print('TOAST');
                       toastInfo(context, 'Deixe o passageiro neste raio para conseguir concluir a corrida, entenderemos que chegou próximo ao seu destino');
                     },
                     center: LatLng(
@@ -247,6 +246,7 @@ class _TripState extends State<Trip> {
         _checkRadius();
       }else{
         if(_isDialogLoading == false){
+          _stream.cancel();
           _controller.checkCancelled = _controller.currentActivity!.id!;
           _controller.toggleTrip(enabled: false,notify: true);
         }
@@ -466,7 +466,7 @@ class _TripState extends State<Trip> {
                         color: Theme.of(context).colorScheme.secondary,
                       ),
                     )
-                  : Text('Concluir'),
+                  : const Text('Concluir'),
             ),
           ],
         );
@@ -476,7 +476,6 @@ class _TripState extends State<Trip> {
 
   @override
   void dispose() {
-    print('disposex');
     try{
       _stream.cancel();
     }catch(e){}
