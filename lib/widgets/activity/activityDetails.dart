@@ -3,6 +3,7 @@ import 'package:app_motoblack_mototaxista/models/Activity.dart';
 import 'package:app_motoblack_mototaxista/models/Passenger.dart';
 import 'package:app_motoblack_mototaxista/models/Vehicle.dart';
 import 'package:app_motoblack_mototaxista/widgets/assets/infoBanner.dart';
+import 'package:app_motoblack_mototaxista/widgets/assets/photoWithRate.dart';
 import 'package:app_motoblack_mototaxista/widgets/trip/tripIcon.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -341,18 +342,7 @@ class _ActivityDetailsState extends State<ActivityDetails> {
             const SizedBox(
               height: 10,
             ),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(25.0),
-              child: CachedNetworkImage(
-                  fit: BoxFit.cover,
-                  width: 50,
-                  height: 50,
-                  placeholder: (context, url) =>
-                      const CircularProgressIndicator(),
-                  errorWidget: (context, url, error) =>
-                      const Icon(Icons.person_off_outlined,color: Colors.black,),
-                  imageUrl: passenger.avatar ?? ''),
-            ),
+            PhotoWithRate(avatar: passenger.avatar, rate: passenger.rate,size: 80,),
             const SizedBox(
               height: 10,
             ),

@@ -91,8 +91,9 @@ class _ToggleOnlineState extends State<ToggleOnline> {
         _listenOnline();
         _listenLocation();
       } else {
-        showAlert(context, "Erro ao iniciar sessão",
-            sol: "Tente novamente mais tarde", error: 'Erro ao iniciar sessão');
+        if(mounted){
+          toastError(context, "Erro ao iniciar sessão. Tente novamente mais tarde");
+        }
       }
       setState(() {});
     } else {
@@ -120,14 +121,16 @@ class _ToggleOnlineState extends State<ToggleOnline> {
           if (!_suggesting) {
             final data = querySnapshot.snapshot.value as Map;
             if (data.containsKey('trips')) {
-              final trips = data['trips'];
-              final tripSuggestion =
-                  trips.entries.firstWhere(
-                    (entry) => 
-                    entry.value == false
-                    ).key;
-              if (tripSuggestion != null) {
-                _showTripSuggestion(tripSuggestion);
+                final trips = data['trips'];
+                if (trips is Map) {
+                  final tripSuggestion =
+                    trips.entries.firstWhere(
+                      (entry) => 
+                      entry.value == false
+                      ).key;
+                if (tripSuggestion != null) {
+                  _showTripSuggestion(tripSuggestion);
+                }
               }
             }
           }

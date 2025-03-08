@@ -5,8 +5,10 @@ import 'package:app_motoblack_mototaxista/models/Vehicle.dart';
 import 'package:app_motoblack_mototaxista/widgets/assets/toast.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class AddVehicle extends StatefulWidget {
   const AddVehicle({super.key, required this.onAdded});
@@ -26,7 +28,7 @@ class _AddVehicleState extends State<AddVehicle> {
   final TextEditingController _plate = TextEditingController();
   final TextEditingController _documentText = TextEditingController();
   Color _color = Colors.black;
-  late VehicleType _type;
+  VehicleType _type = VehicleType.motorcycle;
   late File _document;
 
   final _controller = VehicleController();
@@ -154,6 +156,7 @@ class _AddVehicleState extends State<AddVehicle> {
                                                 .inversePrimary,
                                           ),
                                           child: DropdownButtonFormField(
+                                            value: VehicleType.motorcycle,
                                             icon: const Icon(
                                               Icons.arrow_drop_down_outlined,
                                               color: Colors.black,
@@ -167,9 +170,10 @@ class _AddVehicleState extends State<AddVehicle> {
                                                   value: VehicleType.car,
                                                   child: Text('Carro'))
                                             ],
-                                            onChanged: (value) {
-                                              _type = value!;
-                                            },
+                                            onChanged: null,
+                                            // onChanged: (value) {
+                                            //   _type = value!;
+                                            // },
                                             validator: (value) {
                                               if (value == null) {
                                                 return 'Informe o tipo';
@@ -270,7 +274,17 @@ class _AddVehicleState extends State<AddVehicle> {
                                           height: 4,
                                         ),
                                         TextFormField(
-                                          controller: _plate,
+                                          controller: _plate, 
+                                          inputFormatters: [
+                                            MaskTextInputFormatter(mask: '###-####', filter: {"#": RegExp(r'[a-zA-Z0-9]')}),
+                                            TextInputFormatter.withFunction(
+                                              (oldValue, newValue) {
+                                                return newValue.copyWith(
+                                                  text: newValue.text.toUpperCase(),
+                                                );
+                                              },
+                                            ),
+                                          ],
                                           validator: (value) {
                                             if (value == null ||
                                                 value.isEmpty) {
@@ -389,6 +403,7 @@ class _AddVehicleState extends State<AddVehicle> {
                           ],
                         ),
                       ),
+                      SizedBox(height: 200,)
                     ],
                   ),
                 ),

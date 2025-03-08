@@ -9,6 +9,23 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
+extension HexColor on Color {
+  String _generateAlpha({required int alpha, required bool withAlpha}) {
+    if (withAlpha) {
+      return alpha.toRadixString(16).padLeft(2, '0');
+    } else {
+      return '';
+    }
+  }
+
+  String toHex({bool leadingHashSign = true, bool withAlpha = false}) =>
+      '${leadingHashSign ? '#' : ''}'
+              '${_generateAlpha(alpha: alpha, withAlpha: withAlpha)}'                  
+              '${red.toRadixString(16).padLeft(2, '0')}'              
+              '${green.toRadixString(16).padLeft(2, '0')}'              
+           '${blue.toRadixString(16).padLeft(2, '0')}'
+          .toUpperCase();
+}
 class VehicleController extends ChangeNotifier {
   int _page = 1;
   bool _hasMore = true;
@@ -56,7 +73,7 @@ class VehicleController extends ChangeNotifier {
         'brand': brand,
         'model': model,
         'plate': plate,
-        'color': '#${color.value.toRadixString(16)}',
+        'color': color.toHex(),
         'type': type.index + 1,
         'document': await MultipartFile.fromFile(document.path)
       });

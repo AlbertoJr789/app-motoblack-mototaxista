@@ -1,4 +1,5 @@
 import 'package:app_motoblack_mototaxista/models/Activity.dart';
+import 'package:app_motoblack_mototaxista/widgets/assets/photoWithRate.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -20,20 +21,7 @@ class ActivitySuggestion extends StatelessWidget {
         Center(
           child: Column(
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(50.0),
-                child: CachedNetworkImage(
-                    fit: BoxFit.cover,
-                    width: 100,
-                    height: 100,
-                    placeholder: (context, url) =>
-                        const CircularProgressIndicator(),
-                    errorWidget: (context, url, error) => const Icon(
-                          Icons.person_off_outlined,
-                          color: Colors.black,
-                        ),
-                    imageUrl: activity.passenger!.avatar ?? ''),
-              ),
+              PhotoWithRate(avatar: activity.passenger!.avatar, rate: activity.passenger!.rate),
               Text(
                 activity.passenger!.name,
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
