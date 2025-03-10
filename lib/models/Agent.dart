@@ -1,5 +1,6 @@
 import 'package:app_motoblack_mototaxista/models/Address.dart';
 import 'package:app_motoblack_mototaxista/models/Vehicle.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum AgentType { motoblack, driver, unknown }
@@ -56,5 +57,11 @@ class Agent {
     SharedPreferences.getInstance().then((instance)=> instance.remove('uuid'));
   }
 
-
+  static String distanceBetween(Position currentLocation, Address destiny) {
+    double dist =  Geolocator.distanceBetween(currentLocation.latitude!, currentLocation.longitude!, destiny.latitude!, destiny.longitude!);
+    if(dist < 1000){
+      return '${dist.toStringAsFixed(2)} metros';
+    }
+    return '${(dist / 1000).toStringAsFixed(2)} km';
+  }
 }

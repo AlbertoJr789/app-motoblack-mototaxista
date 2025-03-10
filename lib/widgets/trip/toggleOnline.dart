@@ -176,7 +176,7 @@ class _ToggleOnlineState extends State<ToggleOnline> {
       barrierDismissible: false,
       builder: (ctx) => StatefulBuilder(builder: (context, setState) {
         return AlertDialog(
-          title: ActivitySuggestion(activity: activity!),
+          title: ActivitySuggestion(activity: activity!,currentLocation: _currentLocation),
           actions: [
             ElevatedButton(
               onPressed: () {

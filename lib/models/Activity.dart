@@ -3,6 +3,7 @@ import 'package:app_motoblack_mototaxista/models/Address.dart';
 import 'package:app_motoblack_mototaxista/models/Passenger.dart';
 import 'package:app_motoblack_mototaxista/models/Vehicle.dart';
 import 'package:dio/dio.dart';
+import 'package:geolocator/geolocator.dart';
 
 enum ActivityType { unknown, trip, carTrip, delivery }
 enum WhoCancelled { unknown, passenger, agent }
@@ -163,7 +164,16 @@ class Activity {
       );
   }
 
-
+  String get distance {
+    if(origin.latitude == null || origin.longitude == null || destiny.latitude == null || destiny.longitude == null){
+      return '0';
+    }
+    double dist =  Geolocator.distanceBetween(origin.latitude!, origin.longitude!, destiny.latitude!, destiny.longitude!);
+    if(dist < 1000){
+      return '${dist.toStringAsFixed(2)} metros';
+    }
+    return '${(dist / 1000).toStringAsFixed(2)} km';
+  }
 
 
 }
