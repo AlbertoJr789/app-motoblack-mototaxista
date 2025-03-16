@@ -63,7 +63,7 @@ class ActivityController extends ChangeNotifier {
       );
       Agent.setUuid(response.data['message']);
       return response.data['message'];
-    } on DioException catch (e) {
+    } on DioException {
       return '';
     }
   }
@@ -80,7 +80,7 @@ class ActivityController extends ChangeNotifier {
       );
       Agent.setUuid('');
       return false;
-    } on DioException catch (e) {
+    } on DioException {
       return true;
     }
   }
@@ -97,7 +97,7 @@ class ActivityController extends ChangeNotifier {
       currentActivity = activity;
       notifyListeners();
       return true;
-    } on DioException catch (e) {
+    } on DioException {
       return false;
     }
   }
@@ -143,7 +143,7 @@ class ActivityController extends ChangeNotifier {
       currentActivity = null;
       notifyListeners();
       return true;
-    } on DioException catch (e) {
+    } on DioException {
       return false;
     } catch (e) {
       return false;

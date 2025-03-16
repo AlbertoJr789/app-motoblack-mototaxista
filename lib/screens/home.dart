@@ -1,4 +1,3 @@
-import 'dart:async';
 
 import 'package:app_motoblack_mototaxista/controllers/activityController.dart';
 import 'package:app_motoblack_mototaxista/models/Activity.dart';

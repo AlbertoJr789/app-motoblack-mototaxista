@@ -1,10 +1,7 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:app_motoblack_mototaxista/controllers/activityController.dart';
 import 'package:app_motoblack_mototaxista/controllers/apiClient.dart';
-import 'package:app_motoblack_mototaxista/models/Activity.dart';
-import 'package:app_motoblack_mototaxista/util/util.dart';
 import 'package:app_motoblack_mototaxista/widgets/assets/toast.dart';
 import 'package:app_motoblack_mototaxista/widgets/trip/tripIcon.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -15,6 +12,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Trip extends StatefulWidget {
   const Trip({super.key});
@@ -83,6 +81,23 @@ class _TripState extends State<Trip> {
                   ),
                 },
           ),
+        Positioned(
+          bottom: 80.0,
+          right: 10.0,
+          child: Tooltip(
+            message: 'Ver Rota no Mapa',
+            child: FloatingActionButton(
+              onPressed: () {
+                launchUrl(Uri.parse('https://www.google.com/maps/dir/${_controller.currentActivity!.origin.googleMapsFormattedAddress}/${_controller.currentActivity!.destiny.googleMapsFormattedAddress}'));
+              },
+              child: Icon(
+                Icons.route,
+                color: Colors.white,
+              ),
+              backgroundColor: Colors.blue,
+            ),
+          ),
+        ),
         Positioned(
           bottom: 10.0,
           right: 10.0,

@@ -71,4 +71,8 @@ class Address {
     return formattedAddress;
   }
 
+  String get googleMapsFormattedAddress {
+    return Uri.encodeComponent('${street}, ${Number} - ${city},${state}');
+  }
+
 }

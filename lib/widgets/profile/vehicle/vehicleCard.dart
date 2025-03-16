@@ -1,6 +1,5 @@
 import 'package:app_motoblack_mototaxista/controllers/vehicleController.dart';
 import 'package:app_motoblack_mototaxista/models/Vehicle.dart';
-import 'package:app_motoblack_mototaxista/widgets/activity/activityDetails.dart';
 import 'package:app_motoblack_mototaxista/widgets/assets/textBadge.dart';
 import 'package:app_motoblack_mototaxista/widgets/assets/toast.dart';
 import 'package:cached_network_image/cached_network_image.dart';

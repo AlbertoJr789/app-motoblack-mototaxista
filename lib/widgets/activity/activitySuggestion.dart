@@ -9,10 +9,18 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class ActivitySuggestion extends StatelessWidget {
+class ActivitySuggestion extends StatefulWidget {
   final Activity activity;
   final Position currentLocation;
+
   const ActivitySuggestion({super.key, required this.activity, required this.currentLocation});
+
+  @override
+  State<ActivitySuggestion> createState() => _ActivitySuggestionState();
+}
+
+class _ActivitySuggestionState extends State<ActivitySuggestion> {
+  bool _loadingPassengerLocation = false;
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +35,9 @@ class ActivitySuggestion extends StatelessWidget {
         Center(
           child: Column(
             children: [
-              PhotoWithRate(avatar: activity.passenger!.avatar, rate: activity.passenger!.rate),
+              PhotoWithRate(avatar: widget.activity.passenger!.avatar, rate: widget.activity.passenger!.rate),
               Text(
-                activity.passenger!.name,
+                widget.activity.passenger!.name,
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ],
@@ -44,7 +52,7 @@ class ActivitySuggestion extends StatelessWidget {
             const SizedBox(width: 8),
             Flexible(
               child: Text(
-                activity.origin.formattedAddress,
+                widget.activity.origin.formattedAddress,
                 style: const TextStyle(fontSize: 14),
               ),
             ),
@@ -59,7 +67,7 @@ class ActivitySuggestion extends StatelessWidget {
             const SizedBox(width: 8),
             Flexible(
               child: Text(
-                activity.destiny.formattedAddress,
+                widget.activity.destiny.formattedAddress,
                 style: const TextStyle(fontSize: 14),
               ),
             ),
@@ -67,7 +75,31 @@ class ActivitySuggestion extends StatelessWidget {
         ),
 
         const SizedBox(height: 10),
-        Text('Distância aproximada: ${activity.distance}',textAlign: TextAlign.left,style: Theme.of(context).textTheme.bodyMedium,),
+        Row(
+          children: [
+            Expanded(child: Text('Distância aproximada: ${widget.activity.distance}',textAlign: TextAlign.left,style: Theme.of(context).textTheme.bodyMedium,)),
+            const SizedBox(width: 3),
+            IconButton(
+              onPressed: () async {
+                final url = 'https://www.google.com/maps/dir/${widget.activity.origin.googleMapsFormattedAddress}/${widget.activity.destiny.googleMapsFormattedAddress}';
+                launchUrl(Uri.parse(url));
+              },
+              tooltip: 'Ver rota no mapa',
+              icon: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(4)
+                    ),
+                    padding: const EdgeInsets.all(4),
+                    child: const Icon(
+                      Icons.search,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+            ),
+          ],
+        ),
 
         const Divider(color: Color.fromRGBO(0, 0, 0, 0.205)),
 
@@ -75,21 +107,37 @@ class ActivitySuggestion extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                "Você se encontra a ${Agent.distanceBetween(currentLocation, activity.origin)} do passageiro",
+                "Você se encontra a ${Agent.distanceBetween(widget.currentLocation, widget.activity.origin)} do passageiro",
                 textAlign: TextAlign.left,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
-            GestureDetector(
-              onTap: () async {
-                  Address currentLocationAddress = await GeoCoderController().inverseGeocode(currentLocation.latitude, currentLocation.longitude);
-                  launchUrl(Uri.parse('https://www.google.com/maps/dir/${currentLocationAddress.formattedAddress}/${activity.origin.formattedAddress}'));
+            IconButton(
+              onPressed: () async {
+                setState(() {
+                  _loadingPassengerLocation = true;
+                });
+                Address currentLocationAddress = await GeoCoderController().inverseGeocode(widget.currentLocation.latitude, widget.currentLocation.longitude);
+                launchUrl(Uri.parse('https://www.google.com/maps/dir/${currentLocationAddress.googleMapsFormattedAddress}/${widget.activity.origin.googleMapsFormattedAddress}'));
+                setState(() {
+                  _loadingPassengerLocation = false;
+                });
               },
-              child: Text(
-                "Ver no mapa",
-                textAlign: TextAlign.left,
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.blue),
-              ),
+              tooltip: 'Ver passageiro no mapa',
+              icon: _loadingPassengerLocation 
+                ? const CircularProgressIndicator() 
+                : Container(
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(4)
+                    ),
+                    padding: const EdgeInsets.all(4),
+                    child: const Icon(
+                      Icons.search,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
             ),
           ],
         ),

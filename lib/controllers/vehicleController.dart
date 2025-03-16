@@ -1,10 +1,7 @@
 import 'dart:io';
 
 import 'package:app_motoblack_mototaxista/controllers/apiClient.dart';
-import 'package:app_motoblack_mototaxista/models/Activity.dart';
-import 'package:app_motoblack_mototaxista/models/Agent.dart';
 import 'package:app_motoblack_mototaxista/models/Vehicle.dart';
-import 'package:app_motoblack_mototaxista/widgets/profile/vehicle/addVehicle.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
