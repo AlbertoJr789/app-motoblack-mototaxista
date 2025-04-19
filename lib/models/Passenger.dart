@@ -16,7 +16,7 @@ class Passenger {
         userId: map['user_id'],
         name: map['name'],
         avatar: map['avatar'], 
-        rate: map['rate'],
+        rate: map['rate'] != null ? double.parse(map['rate'].toString()) : null,
         );
   }
 
