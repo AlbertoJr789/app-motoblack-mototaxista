@@ -153,13 +153,15 @@ class _AddVehicleState extends State<AddVehicle> {
                                           data: Theme.of(context).copyWith(
                                             canvasColor: Theme.of(context)
                                                 .colorScheme
-                                                .inversePrimary,
+                                                .inversePrimary, 
+                                            disabledColor: Theme.of(context).colorScheme.secondary,
                                           ),
                                           child: DropdownButtonFormField(
                                             value: VehicleType.motorcycle,
-                                            icon: const Icon(
+                                            style: TextStyle(color: Theme.of(context).colorScheme.secondary,),
+                                            icon: Icon(
                                               Icons.arrow_drop_down_outlined,
-                                              color: Colors.black,
+                                              color: Theme.of(context).colorScheme.secondary,
                                             ),
                                             isExpanded: true,
                                             items: const [
@@ -379,21 +381,21 @@ class _AddVehicleState extends State<AddVehicle> {
                                             _saveVehicle(context);
                                           }
                                         : null,
-                                    icon: const Icon(
+                                    icon: Icon(
                                       Icons.save,
-                                      color: Colors.white,
+                                      color: Theme.of(context).colorScheme.secondary,
                                     ),
                                     label: !_isSaving
-                                        ? const Text(
+                                        ? Text(
                                             'Salvar',
                                             style: TextStyle(
                                                 fontSize: 18,
-                                                color: Colors.white),
+                                                color: Theme.of(context).colorScheme.secondary),
                                           )
-                                        : const Padding(
+                                        : Padding(
                                             padding: EdgeInsets.all(8.0),
                                             child: CircularProgressIndicator(
-                                              color: Colors.black,
+                                              color: Theme.of(context).colorScheme.secondary,
                                             ),
                                           ),
                                   ),

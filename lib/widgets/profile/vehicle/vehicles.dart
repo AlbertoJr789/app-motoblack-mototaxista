@@ -128,14 +128,14 @@ class _VehiclesState extends State<Vehicles> {
               children: [
                 ElevatedButton.icon(
                   onPressed: _addVehicle,
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.add,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.secondary,
                   ),
-                  label: const Text(
+                  label: Text(
                     'Adicionar Veículo',
                     style: TextStyle(
-                      fontSize: 18, color: Colors.white
+                      fontSize: 18, color: Theme.of(context).colorScheme.secondary
                     ),
                   )
                 ),
