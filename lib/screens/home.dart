@@ -3,7 +3,9 @@ import 'package:app_motoblack_mototaxista/controllers/activityController.dart';
 import 'package:app_motoblack_mototaxista/models/Activity.dart';
 import 'package:app_motoblack_mototaxista/util/util.dart';
 import 'package:app_motoblack_mototaxista/widgets/assets/errorMessage.dart';
+import 'package:app_motoblack_mototaxista/widgets/assets/news_carousel.dart';
 import 'package:app_motoblack_mototaxista/widgets/assets/toast.dart';
+import 'package:app_motoblack_mototaxista/widgets/assets/weatherDisplay.dart';
 import 'package:app_motoblack_mototaxista/widgets/trip/toggleOnline.dart';
 import 'package:app_motoblack_mototaxista/widgets/trip/trip.dart';
 import 'package:flutter/material.dart';
@@ -89,6 +91,7 @@ class _HomeState extends State<Home> {
         child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          const SizedBox(height: 60),
           Text("Iniciar atividades",
               style: Theme.of(context)
                   .textTheme
@@ -101,7 +104,20 @@ class _HomeState extends State<Home> {
             height: 12,
           ),
           if(_tripController.enableTrip)
-            const ToggleOnline()
+            const ToggleOnline(),
+
+          const WeatherDisplay(),
+          const SizedBox(height: 20),
+          const Expanded(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 16.0),
+                child: NewsCarousel(),
+              ),
+            ),
+          ),
+
         ],
       )); 
       } 
