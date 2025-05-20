@@ -23,6 +23,7 @@ class _ProfileDetailsState extends State<ProfileDetails> {
   Map _profileData = {};
   bool _isSaving = false;
   bool _errorProfileData = false;
+  bool _fetchingProfileData = true;
 
   final TextEditingController _name = TextEditingController();
   final TextEditingController _phone = TextEditingController();
@@ -93,6 +94,7 @@ class _ProfileDetailsState extends State<ProfileDetails> {
       _picture = _profileData['photo'];
       setState(() {
         _errorProfileData = false;
+        _fetchingProfileData = false;
       });
     }
   }
@@ -149,6 +151,9 @@ class _ProfileDetailsState extends State<ProfileDetails> {
 
   @override
   Widget build(BuildContext context) {
+    if(_fetchingProfileData){
+      return const Center(child: CircularProgressIndicator(),);
+    }
     return Form(
       key: _formKey,
       child: _errorProfileData
