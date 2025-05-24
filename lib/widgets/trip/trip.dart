@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:app_motoblack_mototaxista/controllers/activityController.dart';
 import 'package:app_motoblack_mototaxista/controllers/apiClient.dart';
+import 'package:app_motoblack_mototaxista/controllers/geoCoderController.dart';
+import 'package:app_motoblack_mototaxista/models/Agent.dart';
 import 'package:app_motoblack_mototaxista/widgets/assets/toast.dart';
 import 'package:app_motoblack_mototaxista/widgets/trip/tripIcon.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -81,11 +83,41 @@ class _TripState extends State<Trip> {
                   ),
                 },
           ),
+           Positioned(
+          bottom: 150.0,
+          right: 10.0,
+          child: Tooltip(
+            message: 'Ver rota até o passageiro',
+            child: FloatingActionButton(
+              onPressed: () async {   
+                final myCoords = await FirebaseDatabase.instance.ref('availableAgents').child(await Agent.getUuid()).get();
+                
+                final currentLocationAddress = await GeoCoderController().inverseGeocode(
+                  double.parse((myCoords.value as Map)['latitude'].toString()),
+                  double.parse((myCoords.value as Map)['longitude'].toString())
+                );
+                
+                final passengerCoords = await FirebaseDatabase.instance.ref('trips').child(_controller.currentActivity!.uuid!).child('passenger').get();
+                final passengerCurrentLocationAddress = await GeoCoderController().inverseGeocode(
+                  double.parse((passengerCoords.value as Map)['latitude'].toString()),
+                  double.parse((passengerCoords.value as Map)['longitude'].toString())
+                );
+                
+                launchUrl(Uri.parse('https://www.google.com/maps/dir/${currentLocationAddress.googleMapsFormattedAddress}/${passengerCurrentLocationAddress.googleMapsFormattedAddress}'));
+              },
+              child: Icon(
+                Icons.person,
+                color: Colors.white,
+              ),
+              backgroundColor: Colors.blue,
+            ),
+          ),
+        ),
         Positioned(
           bottom: 80.0,
           right: 10.0,
           child: Tooltip(
-            message: 'Ver Rota no Mapa',
+            message: 'Ver rota da corrida',
             child: FloatingActionButton(
               onPressed: () {
                 launchUrl(Uri.parse('https://www.google.com/maps/dir/${_controller.currentActivity!.origin.googleMapsFormattedAddress}/${_controller.currentActivity!.destiny.googleMapsFormattedAddress}'));
