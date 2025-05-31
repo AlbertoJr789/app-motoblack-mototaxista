@@ -148,10 +148,10 @@ class _ToggleOnlineState extends State<ToggleOnline> {
     _locationListener = Geolocator.getPositionStream().listen((Position position) {
       _currentLocation = position;
       if(_online){
-        //  FirebaseDatabase.instance.ref('availableAgents').child(_uuid).update({
-        //   'latitude': position.latitude,
-        //   'longitude': position.longitude
-        // });
+          FirebaseDatabase.instance.ref('availableAgents').child(_uuid).update({
+            'latitude': position.latitude,
+            'longitude': position.longitude
+          });
         }
       });
   }
