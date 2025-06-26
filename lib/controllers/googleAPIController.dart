@@ -7,7 +7,7 @@ import 'dart:convert';
 
 class GoogleAPIController implements Geocoder {
 
-  static String _apiKey = 'AIzaSyCgo47TDRIpqJ2ZDmMcGWwkxI6oejOju0U';
+  static String _apiKey = ''; // Replace with your actual API key
 
   @override
    geocode(Address address) async {
