@@ -31,7 +31,7 @@ Um aplicativo móvel desenvolvido em Flutter para mototaxistas gerenciarem suas 
 - **Material Design**: Design system do Google
 
 ### Backend & APIs
-- **Firebase**: Autenticação, banco de dados em tempo real e notificações
+- **Firebase**: Banco de dados em tempo real 
 - **Google Maps API**: Mapas, geolocalização e navegação
 - **HERE API**: Geocodificação e autocomplete de endereços
 - **G1 RSS Feed**: Feed de notícias
