@@ -50,7 +50,8 @@ url_launcher: ^6.3.1
 ```
 
 ## 📋 Pré-requisitos
-
+- Instalação e configuração da <a href="https://github.com/AlbertoJr789/app-motoblack-site-api">API Moto Black</a> (IMPORTANTE)
+- Instalação e configuração do <a href="https://github.com/AlbertoJr789/app-motoblack-cliente">APP Cliente</a>.
 - Flutter SDK (versão >=3.0.0), última versão que compilei foi a 3.24.5
 - Dart SDK
 - Android Studio / VS Code
@@ -58,7 +59,6 @@ url_launcher: ^6.3.1
 - Conta <a href="https://console.firebase.google.com/u/0/?hl=pt-br"> Firebase </a>
 - Conta para chave de <a href="https://developer.here.com/login"> API Here Technologies </a>
 - Conta para chave de <a href="https://openweathermap.org/api"> API OpenWeather </a>
-- Instalação e configuração da <a href="https://github.com/AlbertoJr789/app-motoblack-site-api">API Moto Black</a> (IMPORTANTE)
 - Dispositivo Android/iOS ou emulador
 
 ## 🏗️ Estrutura do Projeto
@@ -197,3 +197,5 @@ flutter run
 - Sistema de rating com estrelas
 - Comentários opcionais
 - Histórico de avaliações
+
+> 💡 **Não conseguiu configurar o projeto ?** [Clique aqui e acesse o vídeo com as instruções](https://youtu.be/m58e9LNdouU ) 
